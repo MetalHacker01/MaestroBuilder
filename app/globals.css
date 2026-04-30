@@ -1,26 +1,139 @@
 @import "tailwindcss";
 
+/* ───────────── Design tokens (warm-neutral, single accent) ───────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-app: #fafaf9;          /* stone-50, warm */
+  --color-surface: #ffffff;
+  --color-surface-2: #fbfaf9;
+  --color-border: #e7e5e4;       /* stone-200 */
+  --color-border-strong: #d6d3d1;
+  --color-text: #1c1917;         /* stone-900 */
+  --color-text-muted: #57534e;   /* stone-600 */
+  --color-text-soft: #78716c;    /* stone-500 */
+
+  --color-accent: #1d4ed8;       /* blue-700, muted */
+  --color-accent-hover: #1e40af; /* blue-800 */
+  --color-accent-soft: #eef2ff;  /* indigo-50 */
+
+  --color-danger: #b91c1c;       /* red-700 */
+
+  --shadow-sm: 0 1px 2px 0 rgba(28, 25, 23, 0.04), 0 1px 1px 0 rgba(28, 25, 23, 0.03);
+  --shadow-md: 0 4px 14px -2px rgba(28, 25, 23, 0.08), 0 2px 4px -1px rgba(28, 25, 23, 0.04);
+  --shadow-lg: 0 16px 40px -10px rgba(28, 25, 23, 0.18), 0 6px 12px -2px rgba(28, 25, 23, 0.06);
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-app: var(--color-app);
+  --color-surface: var(--color-surface);
+  --color-border: var(--color-border);
+  --color-text: var(--color-text);
+  --color-accent: var(--color-accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
+  background: var(--color-app);
+  color: var(--color-text);
+  font-feature-settings: "ss01", "cv11";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+* {
+  border-color: var(--color-border);
+}
+
+/* Subtle ambient texture on big surfaces */
+.mb-grain {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(29, 78, 216, 0.04), transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(247, 144, 9, 0.04), transparent 50%);
+}
+
+
+/* Range slider polish */
+input[type="range"] {
+  height: 6px;
+  accent-color: var(--color-accent);
+}
+
+/* Keyboard focus rings — visible only on tab nav */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:active:not(:disabled),
+[role="button"]:active {
+  transform: translateY(0.5px);
+}
+
+/* ───────────── Tiptap (no @tailwindcss/typography plugin) ───────────── */
+.ProseMirror {
+  outline: none;
+  min-height: 80px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text);
+}
+.ProseMirror p { margin: 0 0 0.5em 0; }
+.ProseMirror p:last-child { margin-bottom: 0; }
+.ProseMirror strong { font-weight: 700; }
+.ProseMirror em { font-style: italic; }
+.ProseMirror s { text-decoration: line-through; }
+.ProseMirror a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ProseMirror ul,
+.ProseMirror ol {
+  margin: 0 0 0.5em 0;
+  padding-left: 1.25em;
+}
+.ProseMirror ul { list-style: disc; }
+.ProseMirror ol { list-style: decimal; }
+.ProseMirror li { margin: 0.15em 0; }
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--color-text-soft);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ───────────── react-colorful sizing ───────────── */
+.react-colorful {
+  width: 200px !important;
+  height: 160px !important;
+}
+.react-colorful__saturation {
+  border-radius: 4px 4px 0 0 !important;
+}
+
+/* ───────────── Editor panels: subtle backgrounds, no harsh borders ───────────── */
+.mb-panel {
+  background: var(--color-surface);
+}
+.mb-panel-tinted {
+  background: var(--color-surface-2);
+}
+
+/* ───────────── Drop indicator ───────────── */
+.mb-drop-indicator {
+  height: 2px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  margin: 6px 0;
+  box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.12);
 }
