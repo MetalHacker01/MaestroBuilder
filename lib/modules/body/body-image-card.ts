@@ -23,7 +23,7 @@ export const bodyImageCard: Module = {
       default: "Photo",
       group: "Image",
     },
-    href: { type: "url", label: "Click-through URL", default: "#", group: "Image" },
+    href: { type: "url", label: "Click-through URL", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Image" },
     radius: {
       type: "number",
       label: "Image radius",

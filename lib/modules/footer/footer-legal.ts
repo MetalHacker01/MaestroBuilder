@@ -10,7 +10,7 @@ export const footerLegal: Module = {
       type: "richtext",
       label: "Legal copy",
       default:
-        "&copy; 2026 Your Company. All rights reserved.<br/>123 Street Name, City, Country.<br/><a href=\"#\" style=\"color:#5B5BD6;\">Privacy policy</a>",
+        "&copy; 2026 Your Company. All rights reserved.<br/>123 Street Name, City, Country.<br/><a href=\"https://martech-maestro-folio-sroh.vercel.app/\" style=\"color:#111111;text-decoration:underline;\">Privacy policy</a>",
       group: "Content",
     },
     align: {

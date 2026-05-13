@@ -71,7 +71,7 @@ export const bodyProductCard: Module = {
     originalPriceColor: { type: "color", label: "Original price colour", default: BRAND.muted, group: "Price" },
 
     ctaText: { type: "text", label: "Button text", default: "Add to cart", group: "Button" },
-    ctaUrl: { type: "url", label: "Button link", default: "https://example.com/product", group: "Button" },
+    ctaUrl: { type: "url", label: "Button link", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Button" },
     ctaBgColor: { type: "color", label: "Button colour", default: BRAND.heading, group: "Button" },
     ctaTextColor: { type: "color", label: "Button text colour", default: "#ffffff", group: "Button" },
     ctaRadius: { type: "number", label: "Button radius", default: 8, min: 0, max: 32, unit: "px", group: "Button" },
@@ -98,8 +98,12 @@ export const bodyProductCard: Module = {
       align: "left",
     });
 
+    // Use `&nbsp;` between prices because Outlook ignores `margin-right`
+    // on inline `<span>` elements (Word renderer treats them as if they
+    // had `margin:0`). The non-breaking spaces survive every client and
+    // keep the two prices from colliding.
     const priceHtml = showOriginal
-      ? `<span style="color:${escapeAttr(p.originalPriceColor)};text-decoration:line-through;font-weight:500;margin-right:10px;">${escapeAttr(p.originalPrice)}</span><span style="color:${escapeAttr(p.priceColor)};font-weight:700;">${escapeAttr(p.price)}</span>`
+      ? `<span style="color:${escapeAttr(p.originalPriceColor)};text-decoration:line-through;font-weight:500;">${escapeAttr(p.originalPrice)}</span>&nbsp;&nbsp;&nbsp;<span style="color:${escapeAttr(p.priceColor)};font-weight:700;">${escapeAttr(p.price)}</span>`
       : `<span style="color:${escapeAttr(p.priceColor)};font-weight:700;">${escapeAttr(p.price)}</span>`;
 
     return `
@@ -109,7 +113,8 @@ export const bodyProductCard: Module = {
           ${p.kicker ? `<mj-text font-family="${FONT_STACK}" font-size="11px" font-weight="700" letter-spacing="0.08em" color="${escapeAttr(p.kickerColor)}" padding="0 0 6px 0">${escapeAttr(p.kicker)}</mj-text>` : ``}
           <mj-text font-family="${FONT_STACK}" font-size="${TYPE_SCALE.h3}px" line-height="1.25" font-weight="700" color="${escapeAttr(p.titleColor)}" padding="0 0 8px 0">${safeHtml(p.title)}</mj-text>
           <mj-text font-family="${FONT_STACK}" font-size="${TYPE_SCALE.body}px" line-height="1.55" color="${escapeAttr(p.descriptionColor)}" padding="0 0 12px 0">${safeHtml(p.description)}</mj-text>
-          <mj-text font-family="${FONT_STACK}" font-size="20px" line-height="1.2" padding="0 0 20px 0">${priceHtml}</mj-text>
+          <mj-text font-family="${FONT_STACK}" font-size="20px" line-height="1.2" padding="0 0 4px 0">${priceHtml}</mj-text>
+          <mj-spacer height="20px" />
           <mj-raw>${buttonHtml}</mj-raw>
         </mj-column>
       </mj-section>

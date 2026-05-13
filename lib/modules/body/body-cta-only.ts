@@ -15,7 +15,7 @@ export const bodyCtaOnly: Module = {
     ctaUrl: {
       type: "url",
       label: "Button link",
-      default: "https://example.com",
+      default: "https://martech-maestro-folio-sroh.vercel.app/",
       group: "Button",
     },
     ctaBgColor: {

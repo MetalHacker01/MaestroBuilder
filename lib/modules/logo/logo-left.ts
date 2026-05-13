@@ -9,13 +9,13 @@ export const logoLeft: Module = {
     imageUrl: {
       type: "image-url",
       label: "Logo image URL",
-      default: "https://placehold.co/200x60/5B5BD6/ffffff/png?text=YOUR+LOGO&font=lato",
+      default: "/maestro-logo.png",
       group: "Image",
     },
     altText: { type: "text", label: "Alt text", default: "Logo", group: "Image" },
-    href: { type: "url", label: "Click-through URL", default: "#", group: "Image" },
+    href: { type: "url", label: "Click-through URL", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Image" },
     width: {
-      type: "number", label: "Logo width", default: 180, min: 40, max: 600, unit: "px", group: "Image",
+      type: "number", label: "Logo width", default: 120, min: 40, max: 600, unit: "px", group: "Image",
     },
     bgColor: { type: "color", label: "Background", default: BRAND.surface, group: "Layout" },
     padding: {

@@ -108,6 +108,25 @@ export async function compileTemplate(
 }
 
 function injectPreviewChrome(html: string): string {
+  // Inject a <base href> so relative URLs (like the default logo
+  // `/maestro-logo.png` shipped from `public/`) resolve against the
+  // editor app's origin instead of `about:srcdoc`. The runtime script
+  // patches it client-side because the server can't know the iframe's
+  // browsing-context origin at compile time. Setting `target="_blank"`
+  // also ensures iframe link clicks open in a new tab rather than
+  // replacing the preview.
+  const baseInject = `
+<base id="mb-preview-base" href="/" target="_blank">
+<script>
+(function(){
+  try {
+    var b = document.getElementById('mb-preview-base');
+    if (b && window.parent && window.parent.location && window.parent.location.origin) {
+      b.setAttribute('href', window.parent.location.origin + '/');
+    }
+  } catch (e) {}
+})();
+</script>`;
   const chrome = `
 <style id="mb-preview-chrome">
   [class*="mb-uid-"] {
@@ -203,10 +222,17 @@ function injectPreviewChrome(html: string): string {
 })();
 </script>
 `;
-  if (html.includes("</body>")) {
-    return html.replace("</body>", `${chrome}</body>`);
+  let out = html;
+  // <base> must be inside <head> so it applies before any <img> resolves.
+  if (out.includes("</head>")) {
+    out = out.replace("</head>", `${baseInject}</head>`);
+  } else {
+    out = baseInject + out;
   }
-  return html + chrome;
+  if (out.includes("</body>")) {
+    return out.replace("</body>", `${chrome}</body>`);
+  }
+  return out + chrome;
 }
 
 function emptyDocument(mode: RenderMode, dark: boolean): string {

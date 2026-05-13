@@ -103,7 +103,7 @@ export const bodyPromoBanner: Module = {
       group: "Button",
     },
     ctaText: { type: "text", label: "Button text", default: "Redeem now", group: "Button" },
-    ctaUrl: { type: "url", label: "Button link", default: "https://example.com", group: "Button" },
+    ctaUrl: { type: "url", label: "Button link", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Button" },
     ctaBgColor: { type: "color", label: "Button colour", default: BRAND.accent, group: "Button" },
     ctaTextColor: { type: "color", label: "Button text colour", default: "#ffffff", group: "Button" },
     ctaRadius: { type: "number", label: "Button radius", default: 8, min: 0, max: 32, unit: "px", group: "Button" },

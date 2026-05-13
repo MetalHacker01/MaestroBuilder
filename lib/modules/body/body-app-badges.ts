@@ -39,7 +39,7 @@ export const bodyAppBadges: Module = {
     appStoreUrl: {
       type: "url",
       label: "App Store URL",
-      default: "https://apps.apple.com/app/your-app",
+      default: "https://martech-maestro-folio-sroh.vercel.app/",
       group: "Apple",
     },
     appStoreImage: {
@@ -52,7 +52,7 @@ export const bodyAppBadges: Module = {
     playStoreUrl: {
       type: "url",
       label: "Google Play URL",
-      default: "https://play.google.com/store/apps/details?id=your.app",
+      default: "https://martech-maestro-folio-sroh.vercel.app/",
       group: "Google",
     },
     playStoreImage: {
@@ -74,7 +74,7 @@ export const bodyAppBadges: Module = {
     badgeGap: {
       type: "number",
       label: "Gap between badges",
-      default: 16,
+      default: 24,
       min: 0,
       max: 60,
       unit: "px",
@@ -100,20 +100,20 @@ export const bodyAppBadges: Module = {
     const badgeWidth = Number(p.badgeWidth ?? 160);
     const badgeGap = Number(p.badgeGap ?? 16);
 
-    // Use an explicit spacer <td> with width attribute + width style. Side-padding
-    // on the badge cells gets collapsed by Outlook + a few mobile renderers; a
-    // dedicated spacer cell is the bulletproof pattern (font-size:0 + line-height:0
-    // + mso-line-height-rule:exactly stop email clients from inserting baseline space).
+    // Use `padding-right` on the first badge's `<td>` for the gap.
+    // A separate spacer cell with `font-size:0` + a hairspace renders
+    // at zero width in Outlook (the empty cell collapses), so the
+    // two badges visually touch. Putting the gap as padding-right on
+    // the first cell is honoured by every client including Outlook.
     const badgesHtml = `
       <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="${align}">
         <tr>
-          <td>
+          <td style="padding-right:${badgeGap}px;" valign="middle">
             <a href="${escapeAttr(p.appStoreUrl)}" style="text-decoration:none;display:block;">
               <img src="${escapeAttr(p.appStoreImage)}" alt="Download on the App Store" width="${badgeWidth}" style="display:block;border:0;width:${badgeWidth}px;height:auto;" />
             </a>
           </td>
-          <td width="${badgeGap}" style="width:${badgeGap}px;font-size:0;line-height:0;mso-line-height-rule:exactly;">&#8202;</td>
-          <td>
+          <td valign="middle">
             <a href="${escapeAttr(p.playStoreUrl)}" style="text-decoration:none;display:block;">
               <img src="${escapeAttr(p.playStoreImage)}" alt="Get it on Google Play" width="${badgeWidth}" style="display:block;border:0;width:${badgeWidth}px;height:auto;" />
             </a>
@@ -125,7 +125,8 @@ export const bodyAppBadges: Module = {
     return `
       <mj-section background-color="${escapeAttr(p.bgColor)}" padding="${spacing(p.padding as never)}">
         <mj-column>
-          ${showHeadline ? `<mj-text align="${align}" font-family="${FONT_STACK}" font-size="18px" line-height="1.2" font-weight="700" color="${escapeAttr(p.headlineColor)}" padding="0 0 24px 0">${safeHtml(p.headline)}</mj-text>` : ``}
+          ${showHeadline ? `<mj-text align="${align}" font-family="${FONT_STACK}" font-size="18px" line-height="1.2" font-weight="700" color="${escapeAttr(p.headlineColor)}" padding="0 0 4px 0">${safeHtml(p.headline)}</mj-text>
+          <mj-spacer height="20px" />` : ``}
           <mj-raw>${badgesHtml}</mj-raw>
         </mj-column>
       </mj-section>

@@ -11,12 +11,12 @@ export const bodyCtaPair: Module = {
   label: "CTA pair (primary + outline)",
   schema: {
     primaryText: { type: "text", label: "Primary button", default: "Get started", group: "Primary" },
-    primaryUrl: { type: "url", label: "Primary URL", default: "https://example.com", group: "Primary" },
+    primaryUrl: { type: "url", label: "Primary URL", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Primary" },
     primaryBg: { type: "color", label: "Primary fill", default: BRAND.accent, group: "Primary" },
     primaryFg: { type: "color", label: "Primary text", default: "#ffffff", group: "Primary" },
 
     secondaryText: { type: "text", label: "Secondary button", default: "Learn more", group: "Secondary" },
-    secondaryUrl: { type: "url", label: "Secondary URL", default: "https://example.com/learn", group: "Secondary" },
+    secondaryUrl: { type: "url", label: "Secondary URL", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Secondary" },
     secondaryBorder: { type: "color", label: "Outline color", default: BRAND.accent, group: "Secondary" },
     secondaryFg: { type: "color", label: "Outline text", default: BRAND.accent, group: "Secondary" },
 

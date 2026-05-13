@@ -12,19 +12,34 @@ import type { Spacing } from "./types";
  * ─────────────────────────────────────────────────────────────────────────
  */
 
+/**
+ * Minimalist-UI palette — warm monochrome editorial tones.
+ *
+ *   - `accent` is off-black (#111111) for CTAs, matching the skill's
+ *     "solid #111111 background, text #FFFFFF" button spec. The old
+ *     indigo (#5B5BD6) became the OPTIONAL pop color (`pop`) for users
+ *     who want a non-neutral button without losing the editorial feel.
+ *   - Surfaces use warm bone (#F7F6F3) and pure white instead of cool
+ *     gray to read as paper, not screen.
+ *   - Borders standardise on #EAEAEA — the canonical minimalist-ui
+ *     1px-divider colour.
+ *   - Text colours stop short of pure black; #111111 + #2F3437 are the
+ *     skill's recommended off-black/charcoal pairing.
+ */
 export const BRAND = {
-  accent: "#5B5BD6",
-  accentDark: "#4747B3",
-  accentSoft: "#EEEEFB",
-  heading: "#0F172A",
-  text: "#1F2937",
-  muted: "#6B7280",
+  accent: "#111111",
+  accentDark: "#000000",
+  accentSoft: "#F7F6F3",
+  pop: "#5B5BD6",
+  heading: "#111111",
+  text: "#2F3437",
+  muted: "#787774",
   surface: "#FFFFFF",
-  surfaceWarm: "#FBFAF7",
-  paper: "#F4F4F2",
-  border: "#E5E7EB",
-  borderSoft: "#EFEFEF",
-  divider: "#D1D5DB",
+  surfaceWarm: "#F7F6F3",
+  paper: "#FBFBFA",
+  border: "#EAEAEA",
+  borderSoft: "#EAEAEA",
+  divider: "#EAEAEA",
   darkSurface: "#1C1B23",
   darkText: "#C1C1C1",
   darkLink: "#9DB7E2",
@@ -77,6 +92,30 @@ export function safeHtml(value: unknown): string {
   return String(value);
 }
 
+/**
+ * Convert `#RRGGBB` + opacity (0-100) to `rgba(r, g, b, a)`. Used for
+ * semi-transparent overlay cards (Schneider pattern: bg image shows
+ * through the dark/coloured overlay).
+ */
+export function hexToRgba(hex: string, opacity: number): string {
+  const clean = String(hex || "").replace(/^#/, "");
+  const full =
+    clean.length === 3
+      ? clean
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : clean;
+  if (!/^[0-9a-fA-F]{6}$/.test(full)) {
+    return `rgba(0, 0, 0, ${(opacity / 100).toFixed(2)})`;
+  }
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  const a = Math.max(0, Math.min(100, opacity)) / 100;
+  return `rgba(${r}, ${g}, ${b}, ${a.toFixed(2)})`;
+}
+
 export function px(n: number | string | undefined, fallback = 0): string {
   if (n == null || n === "") return `${fallback}px`;
   if (typeof n === "string" && n.endsWith("px")) return n;
@@ -84,32 +123,33 @@ export function px(n: number | string | undefined, fallback = 0): string {
 }
 
 /* ──────────────────────────────────────────────────────────────────────
- * Bulletproof CTA button.
+ * Bulletproof CTA button — MasterClass / Xbox pattern.
  *
- * MJML's stock `<mj-button>` only emits a styled `<a>` inside a coloured
- * table cell — Outlook 2007-2019 desktop ignores `border-radius` on
- * `<td>` so the corners go square. The fix is the canonical Litmus
- * pattern: a hidden VML `<v:roundrect>` for Outlook + a regular HTML
- * button for everyone else, with `mso-hide:all` on the HTML side.
+ * Pattern: `<a>` wraps a `<table>` with `border-radius` on the inner
+ * `<td>` (filled), or `border: 2px solid X` (outline). NO VML.
  *
- * arcsize is the VML "how round" parameter, expressed as a percentage of
- * half the shortest side. arcsize = round(2 * radius / min(w,h) * 100).
- * For an 8px radius on a 44px-tall button that's ~36%.
+ *   - Outlook 2007-2019 desktop ignores `border-radius` → renders SQUARE
+ *     corners. Trade-off accepted across MasterClass, Klaviyo, Xbox,
+ *     Mailchimp, etc.
+ *   - Every other client (Gmail, Apple Mail, Outlook web, mobile) honours
+ *     `border-radius` → renders rounded.
+ *   - MAP-trackable everywhere because the outer `<a href>` is a plain
+ *     HTML anchor — SFMC, Marketo, Eloqua, HubSpot all rewrite it.
+ *   - Padding on the td renders correctly in Outlook (no v-text-anchor
+ *     drift, no double borders).
  * ──────────────────────────────────────────────────────────────────── */
 export type BulletproofButtonOptions = {
   href: string;
   text: string;
   bgColor?: string;
   textColor?: string;
-  borderColor?: string; // outline variant — defaults to bgColor
-  outline?: boolean;    // ghost button: transparent fill, coloured border + text
-  width?: number;       // px, default content-fit (~auto)
-  height?: number;      // px, default 44
-  radius?: number;      // px, default 8
-  paddingY?: number;    // px, default 12
-  paddingX?: number;    // px, default 28
+  borderColor?: string;        // outline variant — defaults to bgColor
+  outline?: boolean;           // ghost button: transparent fill, coloured border + text
+  radius?: number;             // px, default 8
+  paddingY?: number;           // px, default 12
+  paddingX?: number;           // px, default 28
   fontFamily?: string;
-  fontSize?: number;    // px, default 14
+  fontSize?: number;           // px, default 15
   fontWeight?: number | string; // default 600
   align?: "left" | "center" | "right";
 };
@@ -117,51 +157,117 @@ export type BulletproofButtonOptions = {
 export function bulletproofButton(opts: BulletproofButtonOptions): string {
   const text = opts.text || "Click here";
   const href = opts.href || "#";
-  const bg = opts.outline ? "transparent" : (opts.bgColor || BRAND.accent);
   const fill = opts.bgColor || BRAND.accent;
   const fg = opts.textColor || (opts.outline ? fill : "#ffffff");
   const stroke = opts.borderColor || fill;
-  const height = opts.height ?? 44;
   const radius = opts.radius ?? 8;
   const padY = opts.paddingY ?? 12;
   const padX = opts.paddingX ?? 28;
   const fontFamily = opts.fontFamily || FONT_STACK;
-  const fontSize = opts.fontSize ?? 14;
+  const fontSize = opts.fontSize ?? 15;
   const fontWeight = opts.fontWeight ?? 600;
   const align = opts.align || "center";
-  const widthAttr = opts.width ? ` style="width:${opts.width}px;"` : "";
 
-  // Approximate VML arcsize from height; clamp 0..100.
+  // Outline variant: transparent fill, coloured 2px border, coloured text.
+  // The border is on the <td> only — single shape, single border on Outlook
+  // (no v:roundrect doubling up). Outlook shows square; webmail rounded.
+  const innerBg = opts.outline ? "transparent" : fill;
+  const tdBgcolor = opts.outline ? "" : `bgcolor="${fill}"`;
+  const borderStyle = opts.outline
+    ? `border:2px solid ${stroke};`
+    : `border:0;`;
+
+  // Pattern: Mailchimp / Litmus "anchor inside td" — the universally
+  // reliable email-button structure.
+  //
+  //   <table align="X" role="presentation">    ← centers via align attr
+  //     <tr><td>                                  ← the visual button cell
+  //       <a display:block>text</a>               ← fills cell, full click area
+  //     </td></tr>
+  //   </table>
+  //
+  // Why this works where "<a> wraps <table>" doesn't:
+  //   - The table is the OUTERMOST element. Its `align="${align}"` attribute
+  //     is the only thing centering it, and it works because the table's
+  //     containing block is always the parent (whatever td/div the caller
+  //     placed it in) — no inline-containing-block edge case.
+  //   - `<a style="display:block">` inside the td fills the entire cell,
+  //     so the whole rounded button is the click target.
+  //   - Single nesting, no <div>/<center>/<a> wrappers — Outlook, Gmail,
+  //     and every webmail client render this identically.
+  //
+  // MAP-tracking note: SFMC, Marketo, Eloqua, HubSpot all rewrite any
+  // `<a href>` they find in the HTML — the anchor's position inside vs
+  // outside the table doesn't matter for tracking.
+  return `
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="${align}"
+      style="border-collapse:separate;line-height:100%;">
+      <tr>
+        <td ${tdBgcolor} align="center" valign="middle"
+          style="background-color:${innerBg};${borderStyle}border-radius:${radius}px;padding:${padY}px ${padX}px;mso-padding-alt:${padY}px ${padX}px;text-align:center;line-height:100%;">
+          <a href="${escapeAttr(href)}" target="_blank"
+             style="display:block;text-decoration:none;color:${fg};font-family:${fontFamily};font-size:${fontSize}px;font-weight:${fontWeight};line-height:1.2;letter-spacing:0.2px;text-align:center;">${escapeAttr(text)}</a>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * VML-aware CTA — for use INSIDE a `<v:textbox>` (e.g. the hero overlay).
+ *
+ * Outlook 2007-2019 ignores `align="center"` on tables nested inside
+ * `<v:textbox>` — that's why the regular bulletproofButton sits left of
+ * center on Outlook when placed in a hero overlay. The Schneider pattern
+ * (see combined_notes.md "Background Image and Round Button" line 431)
+ * solves this by:
+ *   1. Hiding the HTML table button from Outlook (`<!--[if !mso]>` block).
+ *   2. Emitting a separate `<v:roundrect>` for Outlook that uses
+ *      `v-text-anchor:middle` + an explicit width — Outlook centers a
+ *      VML shape using the parent `<center>` element reliably, unlike
+ *      HTML tables which it doesn't.
+ *
+ * The caller wraps this whole helper in `<center>...</center>` (which is
+ * what Outlook needs to centre the VML shape). Webmail sees only the
+ * HTML table, also centered by the same `<center>`.
+ * ──────────────────────────────────────────────────────────────────── */
+export type VmlButtonOptions = BulletproofButtonOptions & {
+  /** VML button width in px — needed because v:roundrect can't auto-size. Default 200. */
+  vmlWidth?: number;
+  /** VML button height in px — controls v:roundrect height. Default 44. */
+  vmlHeight?: number;
+};
+
+export function bulletproofButtonVml(opts: VmlButtonOptions): string {
+  const text = opts.text || "Click here";
+  const href = opts.href || "#";
+  const fill = opts.bgColor || BRAND.accent;
+  const fg = opts.textColor || "#ffffff";
+  const radius = opts.radius ?? 8;
+  const fontFamily = opts.fontFamily || FONT_STACK;
+  const fontSize = opts.fontSize ?? 15;
+  const fontWeight = opts.fontWeight ?? 600;
+  const vmlWidth = opts.vmlWidth ?? 200;
+  const vmlHeight = opts.vmlHeight ?? 44;
+  // VML arcsize = (2 * radius / shortest-side) * 100, clamped 0-100.
   const arcsize = Math.max(
     0,
-    Math.min(100, Math.round((2 * radius * 100) / height))
+    Math.min(100, Math.round((2 * radius * 100) / Math.min(vmlWidth, vmlHeight)))
   );
-
-  const vmlFill = opts.outline
-    ? `fillcolor="#ffffff" filled="false"`
-    : `fillcolor="${fill}"`;
-  const vmlStroke = opts.outline
-    ? `strokecolor="${stroke}" strokeweight="2px"`
-    : `strokecolor="${fill}" strokeweight="0px"`;
-
-  // The VML `<center>` sits inside the <v:roundrect> textbox; the HTML <a>
-  // is hidden from Outlook via `mso-hide:all` to prevent dual-render.
+  const htmlButton = bulletproofButton({ ...opts, align: "center" });
   return `
-    <div style="text-align:${align};">
-      <!--[if mso]>
-      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
-        href="${escapeAttr(href)}"
-        style="height:${height}px;v-text-anchor:middle;${opts.width ? `width:${opts.width}px;` : "width:200px;"}"
-        arcsize="${arcsize}%" ${vmlFill} ${vmlStroke}>
-        <w:anchorlock/>
-        <center style="font-family:${fontFamily};font-size:${fontSize}px;font-weight:${fontWeight};color:${fg};letter-spacing:0.2px;">${escapeAttr(text)}</center>
-      </v:roundrect>
-      <![endif]-->
-      <!--[if !mso]><!-- -->
-      <a href="${escapeAttr(href)}"${widthAttr}
-         style="background-color:${bg};border:${opts.outline ? `2px solid ${stroke}` : "0"};border-radius:${radius}px;color:${fg};display:inline-block;font-family:${fontFamily};font-size:${fontSize}px;font-weight:${fontWeight};line-height:${height - padY * 2 - (opts.outline ? 4 : 0)}px;letter-spacing:0.2px;padding:${padY}px ${padX}px;text-align:center;text-decoration:none;mso-hide:all;">${escapeAttr(text)}</a>
-      <!--<![endif]-->
-    </div>
+    <!--[if mso]>
+    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+      href="${escapeAttr(href)}"
+      style="height:${vmlHeight}px;v-text-anchor:middle;width:${vmlWidth}px;"
+      arcsize="${arcsize}%" stroke="f" fillcolor="${fill}">
+      <w:anchorlock/>
+      <center style="font-family:${fontFamily};font-size:${fontSize}px;color:${fg};font-weight:${fontWeight};">${escapeAttr(text)}</center>
+    </v:roundrect>
+    <![endif]-->
+    <!--[if !mso]><!-->
+    ${htmlButton}
+    <!--<![endif]-->
   `;
 }
 
@@ -190,21 +296,27 @@ export type BulletproofBgOptions = {
 /**
  * Bulletproof background image with content overlay.
  *
- * Pattern matches the canonical Schneider / training-docs approach
- * (combined_notes.md → "Background Image"):
+ * Schneider's exact pattern (sch_email.html line 692-758) — the cleanest
+ * way to render a transparent overlay card on top of a bg image across
+ * Gmail, Apple Mail, mobile, AND Outlook desktop:
  *
- *   - Outer `<td background="">` + `style="background-image:url()"` for
- *     webmail (Apple Mail, Gmail web, Yahoo, mobile)
- *   - `<v:image src="...">` for Outlook desktop — top-level VML
- *     element, more reliable than `<v:fill type="frame">` which often
- *     silently falls back to fillcolor when the image isn't on a
- *     CDN with permissive headers
- *   - `<v:rect>` with `<v:fill opacity="0%">` overlaid via
- *     `position:absolute` to host the `<v:textbox>` for the text
- *     content (otherwise Outlook would render the image OR the
- *     content, not both)
- *   - Inner content is plain HTML inside `valign="middle"` for
- *     vertical centering across all clients
+ *   - Outer `<td background="...">` + `style="background-image:url()"` for
+ *     webmail. NO position:absolute anywhere.
+ *   - `<v:rect>` with `<v:fill type="frame" src="..." color="...">` for
+ *     Outlook. `type="frame"` scales the image to fill the rect; the
+ *     `color` is the bgcolor fallback if the image is blocked.
+ *   - `<v:textbox style="mso-fit-shape-to-text:true">` makes the v:rect
+ *     auto-grow to fit the overlay content height — no fixed banner
+ *     height needed, no stretched images.
+ *   - NO separate `<v:image>` (Schneider doesn't use one). The image is
+ *     painted into the v:rect via v:fill. The same overlay HTML renders
+ *     inside the v:textbox in Outlook and directly in the td everywhere
+ *     else. ONE code path. Outlook positions content via natural document
+ *     flow inside the textbox, which is reliable.
+ *
+ * The `opts.height` parameter is now a HINT, not a fixed dimension. The
+ * actual rendered height is determined by the overlay content + the
+ * `mso-fit-shape-to-text:true` auto-sizing.
  */
 export function bulletproofBgImage(opts: BulletproofBgOptions): string {
   const fallback = opts.bgColor || BRAND.heading;
@@ -214,28 +326,16 @@ export function bulletproofBgImage(opts: BulletproofBgOptions): string {
       align="${align}" width="${opts.width}"
       style="width:${opts.width}px;max-width:100%;">
       <tr>
-        <td valign="middle" align="center" height="${opts.height}"
+        <td valign="top" align="left"
           background="${escapeAttr(opts.imageUrl)}" bgcolor="${fallback}"
-          style="height:${opts.height}px;background-image:url('${escapeAttr(opts.imageUrl)}');background-color:${fallback};background-position:center;background-size:cover;background-repeat:no-repeat;">
+          style="background-image:url('${escapeAttr(opts.imageUrl)}');background-color:${fallback};background-position:center;background-size:cover;background-repeat:no-repeat;vertical-align:top;">
           <!--[if gte mso 9]>
-          <v:image xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false"
-            src="${escapeAttr(opts.imageUrl)}"
-            style="border:0;display:inline-block;position:absolute;width:${opts.width}px;height:${opts.height}px;" />
           <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false"
-            style="border:0;display:inline-block;position:absolute;width:${opts.width}px;height:${opts.height}px;">
-            <v:fill opacity="0%" color="${fallback}" />
-            <v:textbox style="mso-fit-shape-to-text:false" inset="0,0,0,0">
+            style="width:${opts.width}px;height:auto;">
+            <v:fill type="frame" src="${escapeAttr(opts.imageUrl)}" color="${fallback}" />
+            <v:textbox style="mso-fit-shape-to-text:true;" inset="0,0,0,0">
           <![endif]-->
-          <table role="presentation" border="0" cellpadding="0" cellspacing="0"
-            align="center" width="${opts.width}" height="${opts.height}"
-            style="width:${opts.width}px;height:${opts.height}px;">
-            <tr>
-              <td valign="middle" align="center" height="${opts.height}"
-                style="height:${opts.height}px;padding:24px 16px;">
-                ${opts.innerHtml}
-              </td>
-            </tr>
-          </table>
+          ${opts.innerHtml}
           <!--[if gte mso 9]>
             </v:textbox>
           </v:rect>

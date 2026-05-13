@@ -72,7 +72,7 @@ export const bodyHeadlineParagraphCta: Module = {
     ctaUrl: {
       type: "url",
       label: "Button link",
-      default: "https://example.com",
+      default: "https://martech-maestro-folio-sroh.vercel.app/",
       group: "Button",
     },
     ctaBgColor: {
@@ -162,7 +162,8 @@ export const bodyHeadlineParagraphCta: Module = {
           font-size="${Number(p.paragraphSize)}px"
           line-height="1.55"
           color="${escapeAttr(p.paragraphColor)}"
-          padding="0 0 20px 0">${safeHtml(p.paragraph)}</mj-text>
+          padding="0 0 4px 0">${safeHtml(p.paragraph)}</mj-text>
+        <mj-spacer height="20px" />
         <mj-raw>${buttonHtml}</mj-raw>
       </mj-column>
     </mj-section>

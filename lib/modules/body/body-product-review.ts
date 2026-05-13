@@ -56,7 +56,7 @@ export const bodyProductReview: Module = {
     imageHref: {
       type: "url",
       label: "Image click-through URL",
-      default: "#",
+      default: "https://martech-maestro-folio-sroh.vercel.app/",
       group: "Image",
     },
     imageRadius: {
@@ -91,7 +91,7 @@ export const bodyProductReview: Module = {
     ratingColor: {
       type: "color",
       label: "Star colour",
-      default: "#0F172A",
+      default: "#111111",
       group: "Rating",
     },
     ratingBgColor: {
@@ -145,7 +145,7 @@ export const bodyProductReview: Module = {
     ctaUrl: {
       type: "url",
       label: "Button link",
-      default: "https://example.com",
+      default: "https://martech-maestro-folio-sroh.vercel.app/",
       group: "Button",
     },
     ctaBgColor: {

@@ -21,7 +21,7 @@ export const bannerHero: Module = {
     href: {
       type: "url",
       label: "Click-through URL",
-      default: "#",
+      default: "https://martech-maestro-folio-sroh.vercel.app/",
       group: "Image",
     },
     bgColor: {

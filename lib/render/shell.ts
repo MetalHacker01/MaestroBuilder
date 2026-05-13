@@ -206,8 +206,29 @@ export function wrapMjml(body: string, options: ShellOptions = {}): string {
           a { text-decoration: underline; }
         </mj-style>
         <mj-style>
+          /* Schneider helpers (sch_email.html): rounded-corner +
+             responsive helpers + banner h1/p margin reset so the
+             headline sits flush at the top of the rgba overlay card. */
+          .rounded-corner { border-radius: 8px; }
+          .button { cursor: pointer; }
+          .banner h1 { line-height: 1.2; margin: 0; }
+          .banner p { margin: 0; }
+        </mj-style>
+        <mj-style>
           @media (max-width:480px) {
             .mj-full-width-mobile { width: 100% !important; max-width: 100% !important; }
+            .fluid { width: 100% !important; max-width: 100% !important; }
+            .mobile-auto-height { height: auto !important; }
+            .responsive-td {
+              margin: 0 auto !important;
+              max-width: 100% !important;
+              width: 100% !important;
+              display: block !important;
+              box-sizing: border-box !important;
+            }
+            .mb-hero-overlay-headline { font-size: 22px !important; line-height: 1.2 !important; }
+            .mb-hero-overlay-paragraph { font-size: 14px !important; line-height: 1.5 !important; }
+            .mb-utility-text > div { font-size: 11px !important; line-height: 1.4 !important; }
           }
         </mj-style>
         ${darkBlock}

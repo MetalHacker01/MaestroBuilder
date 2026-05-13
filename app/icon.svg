@@ -1,0 +1,10 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Maestro Builder">
+  <!-- Rounded indigo square — brand accent #5B5BD6 -->
+  <rect width="32" height="32" rx="7" fill="#5B5BD6"/>
+  <!-- Envelope body — slightly inset for breathing room at small sizes -->
+  <rect x="6" y="9" width="20" height="14" rx="1.5" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Envelope flap fold (the V) -->
+  <path d="M6.5 11.5l9.5 6 9.5-6" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Small accent dot — "developer cursor" hint, mirrors the logo's code-cursor concept -->
+  <circle cx="24.5" cy="22" r="1.2" fill="#ffffff"/>
+</svg>

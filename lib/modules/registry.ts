@@ -6,6 +6,7 @@ import { logoCenter } from "./logo/logo-center";
 import { logoRight } from "./logo/logo-right";
 import { bannerHero } from "./banner/banner-hero";
 import { heroBgImage } from "./banner/hero-bg-image";
+import { heroStacked } from "./banner/hero-stacked";
 import { bannerImageLeft } from "./banner/banner-image-left";
 import { bannerImageRight } from "./banner/banner-image-right";
 import { bodyHeadlineParagraph } from "./body/body-headline-paragraph";
@@ -19,7 +20,9 @@ import { bodyCtaOnly } from "./body/body-cta-only";
 import { bodyCtaPair } from "./body/body-cta-pair";
 import { bodyImageCard } from "./body/body-image-card";
 import { bodyQuote } from "./body/body-quote";
+import { bodyTestimonialImage } from "./body/body-testimonial-image";
 import { bodyPromoBanner } from "./body/body-promo-banner";
+import { bodyPromoCallout } from "./body/body-promo-callout";
 import { bodyProductCard } from "./body/body-product-card";
 import { bodyProductReview } from "./body/body-product-review";
 import { bodyStatRow } from "./body/body-stat-row";
@@ -41,6 +44,7 @@ export const MODULES: Module[] = [
   logoRight,
   // Banner / Hero
   bannerHero,
+  heroStacked,
   heroBgImage,
   bannerImageLeft,
   bannerImageRight,
@@ -54,7 +58,9 @@ export const MODULES: Module[] = [
   bodyBulletsNumbered,
   bodyImageCard,
   bodyQuote,
+  bodyTestimonialImage,
   bodyPromoBanner,
+  bodyPromoCallout,
   bodyProductCard,
   bodyProductReview,
   bodyStatRow,

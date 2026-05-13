@@ -195,12 +195,36 @@ That's it. The palette, property panel, drag-drop, save / load, send-test, and d
 | Button radius | 8px (`arcsize="36%"` for VML at 44px height) |
 | Spacing rhythm | 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 |
 
-## Known limitations
+## Known limitations & tradeoffs
 
-- **Outlook desktop renders square corners on the hero overlay card.** The trade-off documented in `combined_notes.md`: the canonical bulletproof bg-image pattern uses `<v:image>` + `<v:rect position:absolute>` for the bg, and nesting a `<v:roundrect>` for the overlay inside that breaks the layout in Outlook. Buttons, banners, and standalone CTAs still get rounded corners on Outlook via VML; only the hero overlay's container is squared on Outlook desktop.
-- **Force-invert clients (Gmail iOS, Outlook 365 Windows desktop) ignore the dark-mode CSS** and apply their own color inversion. Maestro emits the correct `prefers-color-scheme` block + `[data-ogsc]` mirrors for the clients that respect them, but you can't override force-invert. Design the light version to read in those clients.
-- **No server-side persistence.** Templates are local-state only; download `.json` to save, drag back in to load. URL `?state=` works for templates under ~6KB encoded.
-- **Single recipient per Mailjet send** (the rest go to BCC). Mailjet v3.1 requires separate messages for distinct primary recipients; for QA test sends BCC is fine.
+### Outlook desktop renders square corners on the hero overlay card
+
+The canonical bulletproof bg-image pattern uses `<v:image>` + `<v:rect position:absolute>` for the background, and nesting a `<v:roundrect>` for the overlay inside that breaks the layout in Outlook (the overlay button drifts to the document origin). Buttons, banners, and standalone CTAs still get rounded corners on Outlook via VML; only the hero overlay's container is squared on Outlook desktop. The hero CTA inside the overlay also uses a flat-table button (no v:roundrect) for the same reason.
+
+### Outlook click tracking on rounded VML buttons
+
+Maestro Builder's `bulletproofButton` uses SFMC's verified pattern: the `<a href>` wraps the entire button (visible to all clients, including Outlook), and the `<v:roundrect href>` carries the same URL for the Outlook-rendered rounded shape. Marketing automation platforms (SFMC, Marketo, Eloqua, HubSpot) reliably rewrite the **outer `<a href>`** for link tracking — so 100% of non-Outlook clicks are tracked.
+
+**Outlook clicks** go through the `<v:roundrect>` href. Whether they're tracked depends on the platform:
+
+- **SFMC** — when you wrap the URL with `%%=RedirectTo(@var)=%%`, AMPscript expands BOTH href slots at send-time. Outlook clicks are tracked. Replace the URL in the exported HTML manually, or use SFMC's "Auto-track all URLs" account setting.
+- **Marketo** — similar pattern with `{{lead.tokens}}` or trackable link tokens. Marketo's link-rewriter does scan mso conditional comments, so it can pick up the v:roundrect href automatically in most templates.
+- **HubSpot** — only rewrites `<a href>`, not VML attributes. Outlook clicks navigate to the original URL with no tracking. The fix is to manually replace the URL in both places with HubSpot's tracked-link token after pasting the template.
+- **Eloqua** — varies by linker mode. Test in Eloqua's preview before relying on Outlook tracking.
+
+If full Outlook-click tracking matters more to you than rounded corners, you can remove the `<!--[if mso]><v:roundrect>...<![endif]-->` blocks from the exported HTML — buttons will render square in Outlook (every client sees just the flat HTML `<a>` + `<table>`) and tracking is universally 100%. This is configurable per-instance; just delete the VML blocks in your editor before pasting into the MAP.
+
+### Force-invert clients ignore dark-mode CSS
+
+Gmail iOS and Outlook 365 Windows desktop apply their own color inversion regardless of `prefers-color-scheme`. Maestro emits the correct media-query CSS + `[data-ogsc]` mirrors for clients that respect them, but you can't override force-invert. Design the light version to read in those clients.
+
+### No server-side persistence
+
+Templates are local-state only. Download `.json` to save, drag back in to load. URL `?state=` works for templates under ~6KB encoded.
+
+### Single primary recipient per Mailjet send
+
+Mailjet v3.1 requires separate messages for distinct primary recipients. Maestro puts the first recipient in `To` and the rest in `Bcc` — fine for QA test sends, not appropriate for production campaigns (use Mailjet's batch API or your real production ESP for those).
 
 ## Development
 

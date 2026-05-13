@@ -33,19 +33,19 @@ export const footerSocial: Module = {
   schema: {
     // Slot 1 — defaults to Facebook so the module renders sensibly out of the box
     slot1Name: { type: "select", label: "Slot 1 — platform", default: "facebook", options: PLATFORM_OPTIONS, group: "Slot 1" },
-    slot1Url:  { type: "url",    label: "Slot 1 — URL",      default: "https://facebook.com/yourpage", group: "Slot 1" },
+    slot1Url:  { type: "url",    label: "Slot 1 — URL",      default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Slot 1" },
     slot1Icon: { type: "image-url", label: "Slot 1 — custom icon URL (optional)", default: "", group: "Slot 1" },
 
     slot2Name: { type: "select", label: "Slot 2 — platform", default: "twitter", options: PLATFORM_OPTIONS, group: "Slot 2" },
-    slot2Url:  { type: "url",    label: "Slot 2 — URL",      default: "https://twitter.com/yourhandle", group: "Slot 2" },
+    slot2Url:  { type: "url",    label: "Slot 2 — URL",      default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Slot 2" },
     slot2Icon: { type: "image-url", label: "Slot 2 — custom icon URL (optional)", default: "", group: "Slot 2" },
 
     slot3Name: { type: "select", label: "Slot 3 — platform", default: "linkedin", options: PLATFORM_OPTIONS, group: "Slot 3" },
-    slot3Url:  { type: "url",    label: "Slot 3 — URL",      default: "https://linkedin.com/company/yourcompany", group: "Slot 3" },
+    slot3Url:  { type: "url",    label: "Slot 3 — URL",      default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Slot 3" },
     slot3Icon: { type: "image-url", label: "Slot 3 — custom icon URL (optional)", default: "", group: "Slot 3" },
 
     slot4Name: { type: "select", label: "Slot 4 — platform", default: "instagram", options: PLATFORM_OPTIONS, group: "Slot 4" },
-    slot4Url:  { type: "url",    label: "Slot 4 — URL",      default: "https://instagram.com/yourhandle", group: "Slot 4" },
+    slot4Url:  { type: "url",    label: "Slot 4 — URL",      default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Slot 4" },
     slot4Icon: { type: "image-url", label: "Slot 4 — custom icon URL (optional)", default: "", group: "Slot 4" },
 
     // Slots 5 & 6 are off by default — set their Platform to enable them
@@ -74,7 +74,7 @@ export const footerSocial: Module = {
     },
     iconColor: {
       type: "color",
-      label: "Icon background",
+      label: "Icon tile colour",
       default: BRAND.muted,
       group: "Style",
     },
@@ -101,16 +101,18 @@ export const footerSocial: Module = {
       const icon = String(p[slotIcon(i)] ?? "").trim();
       if (name === "none" || url === "") continue;
 
-      // If a custom icon is provided, use src= and skip name= (MJML uses src
-      // when both are set; we omit name to be explicit and avoid platform
-      // colour fills bleeding through).
+      // Coloured tile behind each icon for visual weight. Outlook can't
+      // round the tile (border-radius is ignored on <td>), so on Outlook
+      // it shows as a square coloured tile with the round PNG icon on
+      // top. Webmail clients honour border-radius:999px → perfect circles.
+      const tileColor = escapeAttr(p.iconColor);
       if (icon) {
         elements.push(
-          `<mj-social-element src="${escapeAttr(icon)}" href="${escapeAttr(url)}" />`
+          `<mj-social-element src="${escapeAttr(icon)}" href="${escapeAttr(url)}" background-color="${tileColor}" />`
         );
       } else {
         elements.push(
-          `<mj-social-element name="${escapeAttr(name)}" href="${escapeAttr(url)}" background-color="${escapeAttr(p.iconColor)}" color="${escapeAttr(p.bgColor)}" />`
+          `<mj-social-element name="${escapeAttr(name)}" href="${escapeAttr(url)}" background-color="${tileColor}" color="${escapeAttr(p.bgColor)}" />`
         );
       }
     }
