@@ -17,23 +17,38 @@ export type CompileOptions = {
   forceDark?: boolean;
 };
 
-const SECTION_TAG_REGEX = /<mj-section(?=\s|>|\/>)/;
+const SECTION_TAG_REGEX = /<mj-section(\s[^>]*)?>/g;
 
 /**
- * Inject `mb-uid-{uid}` and `mb-section` onto the first <mj-section>, plus
- * `mb-text` on every <mj-text> and `mb-btn` on every <mj-button>. Also handles
- * existing `css-class` attributes by merging into them.
+ * Inject `mb-uid-{uid}` and `mb-section` onto EVERY <mj-section> a module
+ * emits (some modules render multiple sections — e.g. body-three-columns
+ * has one for the headline + one for the columns row — and both need the
+ * uid to be selectable in the editor). Also tags `mb-text` on every
+ * <mj-text> and `mb-btn` on every <mj-button>. Existing `css-class`
+ * attributes are merged into.
  */
 function annotate(mjml: string, uid: string): string {
   let out = mjml;
 
-  // First section gets mb-uid-X + mb-section
-  if (SECTION_TAG_REGEX.test(out)) {
-    out = out.replace(
-      SECTION_TAG_REGEX,
-      `<mj-section css-class="mb-uid-${uid} mb-section"`
-    );
-  }
+  // Annotate every <mj-section> with mb-uid-X + mb-section, merging any
+  // existing css-class.
+  out = out.replace(SECTION_TAG_REGEX, (m, attrs?: string) => {
+    if (!attrs) return `<mj-section css-class="mb-uid-${uid} mb-section">`;
+    if (/\bcss-class\s*=/.test(attrs)) {
+      return m.replace(
+        /css-class\s*=\s*"([^"]*)"/,
+        (_a, val: string) => `css-class="mb-uid-${uid} mb-section ${val}"`
+      );
+    }
+    return `<mj-section${attrs} css-class="mb-uid-${uid} mb-section">`;
+  });
+
+  // Modules that emit pure HTML inside <mj-raw> (e.g. hero-bg-image, which
+  // bypasses MJML section wrapping to match Schneider's verbatim Outlook
+  // structure) use the literal token `__MB_UID__` in their class attributes.
+  // We swap it for the real uid here so the editor's click-to-select
+  // selector + the dark-mode CSS rules still find the element.
+  out = out.replaceAll("__MB_UID__", uid);
 
   // Tag every mj-text. If a css-class already exists, merge.
   out = out.replace(/<mj-text(\s[^>]*)?>/g, (m, attrs?: string) => {

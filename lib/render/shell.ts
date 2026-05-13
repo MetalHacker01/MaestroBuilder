@@ -26,20 +26,25 @@ const BG_PROPS = ["bgColor", "backgroundColor"];
  * Props that drive text colour, in priority order. We pick the first one we
  * find on each instance to drive the dark-mode text colour for that section.
  *
- * Buttons (`ctaBgColor`, `ctaTextColor`) are intentionally OMITTED — buttons
- * keep their brand colour in dark mode, otherwise saturated red/blue buttons
- * would all collapse to indistinguishable mud.
+ * Buttons + bullet bgs + any other grayscale fills are handled by the
+ * auto-invert pass at the bottom of instanceDarkRules. After the
+ * minimalist-ui rebrand all default CTA backgrounds are grayscale
+ * off-black, which would blend into the near-black dark-mode page bg
+ * if left untransformed.
  */
 const TEXT_PROPS = [
   "headlineColor",
   "paragraphColor",
   "textColor",
   "bodyColor",
-  "bulletColor",
   "captionColor",
   "leftHeadlineColor",
   "rightHeadlineColor",
 ];
+// `bulletColor` was previously listed here but it's actually the
+// BACKGROUND of the bullet circle, not a text colour — the auto-invert
+// pass below handles it correctly as a bg.
+
 
 type DarkRule = {
   selector: string;
@@ -57,6 +62,28 @@ function pickFirstColor(
   }
   return undefined;
 }
+
+/**
+ * Returns true when `hex` is a near-grayscale tone (R≈G≈B). These are the
+ * colours we want to invert in dark mode — black/white/grays would otherwise
+ * blend into the dark page bg. Saturated brand colours return false and are
+ * left untouched.
+ */
+function isGrayscale(hex: string): boolean {
+  const clean = hex.replace(/^#/, "");
+  const full =
+    clean.length === 3
+      ? clean.split("").map((c) => c + c).join("")
+      : clean;
+  if (!/^[0-9a-fA-F]{6}$/.test(full)) return false;
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  return max - min <= 12; // within 12/255 of each channel = practically gray
+}
+
 
 function instanceDarkRules(inst: ModuleInstance): DarkRule[] {
   const rules: DarkRule[] = [];
@@ -112,6 +139,63 @@ function instanceDarkRules(inst: ModuleInstance): DarkRule[] {
       value: text,
     }
   );
+
+  // Auto-invert any GRAYSCALE colour prop on this instance. Catches:
+  //   - ctaBgColor / primaryBg / panelColor / bulletColor (dark fills that
+  //     would blend into the dark page bg if left as-is)
+  //   - ctaTextColor / bulletTextColor (off-white text on a dark fill that
+  //     needs to flip to off-black after the fill goes light)
+  //   - any future prop names — we scan every value, not a fixed list, so
+  //     new modules don't need to register here.
+  // Saturated brand colours (#5B5BD6, the `pop` indigo, etc.) are skipped
+  // by the isGrayscale gate so the brand stays branded.
+  const seen = new Set<string>();
+  for (const [key, raw] of Object.entries(inst.props)) {
+    if (!isHexColor(raw)) continue;
+    if (BG_PROPS.includes(key) || TEXT_PROPS.includes(key)) continue; // already handled above
+    const hex = raw.trim();
+    if (!isGrayscale(hex)) continue;
+    if (seen.has(hex.toLowerCase())) continue;
+    seen.add(hex.toLowerCase());
+
+    // Lightness threshold: dark grayscale (#000–#444) flips to off-white,
+    // light grayscale (#ddd–#fff) flips to off-black. Mid-grays stay close
+    // to where they were (no-op).
+    const lum = parseInt(hex.replace(/^#/, "").slice(0, 2), 16);
+    let inverted: string;
+    if (lum < 0x66) inverted = lightText(hex); // dark → light
+    else if (lum > 0xcc) inverted = darkBg(hex); // light → dark
+    else continue; // mid-gray, leave alone
+
+    // Hit BOTH bgcolor-as-attribute and inline `background-color:` style.
+    // Lowercase + uppercase hex both — Outlook normalises attr values
+    // sometimes, so we cover both casings.
+    rules.push(
+      {
+        selector: `.mb-uid-${uid} [bgcolor="${hex}"]`,
+        property: "background-color",
+        value: inverted,
+      },
+      {
+        selector: `.mb-uid-${uid} [bgcolor="${hex.toUpperCase()}"]`,
+        property: "background-color",
+        value: inverted,
+      }
+    );
+
+    // For dark fills, also flip the text colour of any <a>/<span> inside
+    // matching cells — buttons typically have white text that needs to
+    // become dark after the bg goes light.
+    if (lum < 0x66) {
+      rules.push(
+        {
+          selector: `.mb-uid-${uid} [bgcolor="${hex}"], .mb-uid-${uid} [bgcolor="${hex}"] *`,
+          property: "color",
+          value: "#111111",
+        }
+      );
+    }
+  }
 
   return rules;
 }

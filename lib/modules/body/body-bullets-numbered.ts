@@ -46,26 +46,24 @@ export const bodyBulletsNumbered: Module = {
     const bulletBg = String(p.bulletColor ?? BRAND.accent);
     const bulletFg = String(p.bulletTextColor ?? "#ffffff");
 
-    // Each row: a small fixed-width column with a 28x28 coloured circle
-    // (bgcolor td, border-radius:50% on webmail), then the step text.
-    // valign="top" + matched line-height keep the circle aligned with
-    // the first line of text and stop the glyph from clipping.
+    // Each row: a fixed 28x28 numbered circle on the left, step text on
+    // the right. We FLATTEN the previous nested-table approach — Outlook's
+    // Word renderer was bottom-aligning the inner table when the right
+    // cell's text wrapped onto multiple lines (the parent td's
+    // valign="top" only governs the immediate text node, not nested table
+    // descendants). Putting the circle's bgcolor + dimensions directly on
+    // the outer td removes the nesting and Outlook now top-aligns reliably.
     const rows = steps
       .map(
         (s, i) => `
           <tr>
-            <td valign="top" align="left" width="40" style="width:40px;padding:6px 16px 14px 0;">
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td bgcolor="${bulletBg}" align="center" valign="middle" width="28" height="28"
-                    style="background-color:${bulletBg};color:${bulletFg};width:28px;height:28px;min-width:28px;border-radius:50%;font-family:${FONT_STACK};font-size:14px;font-weight:700;line-height:28px;text-align:center;mso-line-height-rule:exactly;">
-                    ${i + 1}
-                  </td>
-                </tr>
-              </table>
+            <td valign="top" align="center" width="28" height="28" bgcolor="${bulletBg}"
+              style="background-color:${bulletBg};color:${bulletFg};width:28px;height:28px;min-width:28px;border-radius:50%;font-family:${FONT_STACK};font-size:14px;font-weight:700;line-height:28px;text-align:center;mso-line-height-rule:exactly;vertical-align:top;">
+              ${i + 1}
             </td>
+            <td valign="top" width="16" style="width:16px;font-size:0;line-height:0;mso-line-height-rule:exactly;">&nbsp;</td>
             <td valign="top"
-              style="font-family:${FONT_STACK};font-size:${TYPE_SCALE.body}px;line-height:1.55;color:${escapeAttr(p.textColor)};padding:8px 0 14px 0;">
+              style="font-family:${FONT_STACK};font-size:${TYPE_SCALE.body}px;line-height:1.55;color:${escapeAttr(p.textColor)};padding:2px 0 14px 0;vertical-align:top;">
               ${safeHtml(s)}
             </td>
           </tr>
