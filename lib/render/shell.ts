@@ -40,6 +40,16 @@ const TEXT_PROPS = [
   "captionColor",
   "leftHeadlineColor",
   "rightHeadlineColor",
+  // three-column + promo callout text props — without these listed the
+  // auto-invert pass treats them as bg colours and tries to invert via
+  // bgcolor selector, which doesn't match (these drive `color:` not
+  // `background-color:`). Listing them here funnels them through the
+  // .mb-text dark-mode pipeline instead.
+  "titleColor",
+  "subheadColor",
+  "linkColor",
+  "kickerColor",
+  "descriptionColor",
 ];
 // `bulletColor` was previously listed here but it's actually the
 // BACKGROUND of the bullet circle, not a text colour — the auto-invert
@@ -284,6 +294,25 @@ export function wrapMjml(body: string, options: ShellOptions = {}): string {
         <mj-raw>
           <meta name="color-scheme" content="${darkEnabled ? "light dark" : "light"}">
           <meta name="supported-color-schemes" content="${darkEnabled ? "light dark" : "light"}">
+          <!--[if mso]>
+          <style>
+            /* Schneider's .blackbg MSO trick (sch_email.html line 466-507):
+               on Outlook desktop, force the overlay card to a SOLID dark
+               background (rgba is dropped by Word renderer) AND nudge it
+               inward via margin so it doesn't sit flush against the bg
+               image's left edge. */
+            .mb-hero-overlay-card {
+              background: #000 !important;
+              margin: 8px 25px !important;
+            }
+            .banner h1 {
+              font-family: Arial, sans-serif !important;
+              font-weight: bold !important;
+              font-size: 26px !important;
+              line-height: 1.2 !important;
+            }
+          </style>
+          <![endif]-->
         </mj-raw>
         <mj-style>
           :root { color-scheme: ${darkEnabled ? "light dark" : "light"}; supported-color-schemes: ${darkEnabled ? "light dark" : "light"}; }

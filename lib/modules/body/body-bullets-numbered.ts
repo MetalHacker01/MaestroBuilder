@@ -46,20 +46,30 @@ export const bodyBulletsNumbered: Module = {
     const bulletBg = String(p.bulletColor ?? BRAND.accent);
     const bulletFg = String(p.bulletTextColor ?? "#ffffff");
 
-    // Each row: a fixed 28x28 numbered circle on the left, step text on
-    // the right. We FLATTEN the previous nested-table approach — Outlook's
-    // Word renderer was bottom-aligning the inner table when the right
-    // cell's text wrapped onto multiple lines (the parent td's
-    // valign="top" only governs the immediate text node, not nested table
-    // descendants). Putting the circle's bgcolor + dimensions directly on
-    // the outer td removes the nesting and Outlook now top-aligns reliably.
+    // Each row: a fixed-size 28x28 circle on the left, step text on the
+    // right. The circle MUST be inside a nested table — putting bgcolor
+    // directly on the outer td stretches the colour to the row's full
+    // height (because td height is dictated by the tallest cell in the
+    // row, and the right-side text wraps to multiple lines). The nested
+    // table is its own layout context: explicit width+height attributes
+    // are honoured, and `valign="top"` on the wrapping td pins it to the
+    // top of the row instead of vertically centring it next to multi-line
+    // step text.
     const rows = steps
       .map(
         (s, i) => `
           <tr>
-            <td valign="top" align="center" width="28" height="28" bgcolor="${bulletBg}"
-              style="background-color:${bulletBg};color:${bulletFg};width:28px;height:28px;min-width:28px;border-radius:50%;font-family:${FONT_STACK};font-size:14px;font-weight:700;line-height:28px;text-align:center;mso-line-height-rule:exactly;vertical-align:top;">
-              ${i + 1}
+            <td valign="top" width="28" style="width:28px;vertical-align:top;padding-bottom:14px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+                style="border-collapse:collapse;">
+                <tr>
+                  <td bgcolor="${bulletBg}" align="center" valign="middle"
+                    width="28" height="28"
+                    style="background-color:${bulletBg};color:${bulletFg};width:28px;height:28px;border-radius:50%;font-family:${FONT_STACK};font-size:14px;font-weight:700;line-height:28px;text-align:center;vertical-align:middle;mso-line-height-rule:exactly;">
+                    ${i + 1}
+                  </td>
+                </tr>
+              </table>
             </td>
             <td valign="top" width="16" style="width:16px;font-size:0;line-height:0;mso-line-height-rule:exactly;">&nbsp;</td>
             <td valign="top"

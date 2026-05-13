@@ -169,13 +169,17 @@ export function bulletproofButton(opts: BulletproofButtonOptions): string {
   const align = opts.align || "center";
 
   // Outline variant: transparent fill, coloured 2px border, coloured text.
-  // The border is on the <td> only — single shape, single border on Outlook
-  // (no v:roundrect doubling up). Outlook shows square; webmail rounded.
+  // FILLED variant gets a matching-colour 2px border too — the border is
+  // invisible (same as the fill) but it makes filled + outline buttons
+  // render at identical outer dimensions. Without this, an outline CTA
+  // sitting next to a filled CTA (e.g. body-cta-pair) looks visibly
+  // larger because the outline's `border:2px solid` adds 4px to width/
+  // height while the filled version has `border:0`.
   const innerBg = opts.outline ? "transparent" : fill;
   const tdBgcolor = opts.outline ? "" : `bgcolor="${fill}"`;
   const borderStyle = opts.outline
     ? `border:2px solid ${stroke};`
-    : `border:0;`;
+    : `border:2px solid ${fill};`;
 
   // Pattern: Mailchimp / Litmus "anchor inside td" — the universally
   // reliable email-button structure.

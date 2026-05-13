@@ -34,19 +34,19 @@ export const bodyThreeColumns: Module = {
       group: "Section",
     },
 
-    col1Icon: { type: "image-url", label: "Icon 1 URL", default: "https://placehold.co/80x80/111111/ffffff/png?text=1", group: "Column 1" },
+    col1Icon: { type: "image-url", label: "Icon 1 URL", default: "https://placehold.co/80x80/F7F6F3/111111/png?text=1", group: "Column 1" },
     col1Title: { type: "richtext", label: "Title 1", default: "<strong>First benefit</strong>", group: "Column 1" },
     col1Body: { type: "richtext", label: "Body 1", default: "Short description of the first benefit and what it solves for the reader.", group: "Column 1" },
     col1LinkText: { type: "text", label: "Link text 1", default: "Learn more", group: "Column 1" },
     col1LinkUrl: { type: "url", label: "Link URL 1", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Column 1" },
 
-    col2Icon: { type: "image-url", label: "Icon 2 URL", default: "https://placehold.co/80x80/111111/ffffff/png?text=2", group: "Column 2" },
+    col2Icon: { type: "image-url", label: "Icon 2 URL", default: "https://placehold.co/80x80/F7F6F3/111111/png?text=2", group: "Column 2" },
     col2Title: { type: "richtext", label: "Title 2", default: "<strong>Second benefit</strong>", group: "Column 2" },
     col2Body: { type: "richtext", label: "Body 2", default: "Short description of the second benefit and what it solves for the reader.", group: "Column 2" },
     col2LinkText: { type: "text", label: "Link text 2", default: "Learn more", group: "Column 2" },
     col2LinkUrl: { type: "url", label: "Link URL 2", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Column 2" },
 
-    col3Icon: { type: "image-url", label: "Icon 3 URL", default: "https://placehold.co/80x80/111111/ffffff/png?text=3", group: "Column 3" },
+    col3Icon: { type: "image-url", label: "Icon 3 URL", default: "https://placehold.co/80x80/F7F6F3/111111/png?text=3", group: "Column 3" },
     col3Title: { type: "richtext", label: "Title 3", default: "<strong>Third benefit</strong>", group: "Column 3" },
     col3Body: { type: "richtext", label: "Body 3", default: "Short description of the third benefit and what it solves for the reader.", group: "Column 3" },
     col3LinkText: { type: "text", label: "Link text 3", default: "Learn more", group: "Column 3" },

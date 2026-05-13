@@ -121,7 +121,11 @@ export const heroBgImage: Module = {
     },
     ctaText: { type: "text", label: "Button text", default: "Get started", group: "Button" },
     ctaUrl: { type: "url", label: "Button link", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Button" },
-    ctaBgColor: { type: "color", label: "Button colour", default: BRAND.accent, group: "Button" },
+    // Default to BRAND.pop (saturated indigo) instead of BRAND.accent
+    // (off-black) — the hero overlay's default card colour is dark, so
+    // an off-black CTA disappears into it. A saturated accent stays
+    // visible against the dark card on every client.
+    ctaBgColor: { type: "color", label: "Button colour", default: BRAND.pop, group: "Button" },
     ctaTextColor: { type: "color", label: "Button text colour", default: "#ffffff", group: "Button" },
     ctaRadius: { type: "number", label: "Button radius", default: 5, min: 0, max: 32, unit: "px", group: "Button" },
     ctaWidth: { type: "number", label: "Button width", default: 180, min: 100, max: 300, unit: "px", group: "Button" },
@@ -137,7 +141,7 @@ export const heroBgImage: Module = {
     cardPadding: {
       type: "spacing",
       label: "Padding around card (controls how much bg image shows around the card)",
-      default: { t: 24, r: 25, b: 24, l: 25 },
+      default: { t: 15, r: 25, b: 15, l: 25 },
       group: "Layout",
     },
   },
@@ -162,9 +166,9 @@ export const heroBgImage: Module = {
     const bgFallback = escapeAttr(p.bgFallback);
     const bannerWidth = Number(p.bannerWidth ?? 640);
     const pad = (p.cardPadding as Spacing | undefined) ?? {
-      t: 24,
+      t: 15,
       r: 25,
-      b: 24,
+      b: 15,
       l: 25,
     };
 
@@ -209,10 +213,10 @@ export const heroBgImage: Module = {
         <v:textbox style="mso-fit-shape-to-text:true" inset="0,0,0,0">
       <![endif]-->
       <div>
-        <table border="0" cellpadding="0" cellspacing="0" class="mobile-auto-height" align="left">
+        <table border="0" cellpadding="0" cellspacing="0" class="mobile-auto-height">
           <tr>
             <td class="responsive-td" style="padding:${pad.t}px ${pad.r}px ${pad.b}px ${pad.l}px;">
-              <table class="fluid rounded-corner" border="0" cellpadding="0" cellspacing="0"
+              <table class="mb-hero-overlay-card fluid rounded-corner" border="0" cellpadding="0" cellspacing="0"
                 bgcolor="${overlayHex}"
                 style="background:${overlayRgba};background-color:${overlayRgba};width:${overlayWidth}px;border-radius:${overlayRadius}px;"
                 width="${overlayWidth}">
