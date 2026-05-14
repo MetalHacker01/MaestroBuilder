@@ -216,7 +216,7 @@ export const heroBgImage: Module = {
         <table border="0" cellpadding="0" cellspacing="0" class="mobile-auto-height">
           <tr>
             <td class="responsive-td" style="padding:${pad.t}px ${pad.r}px ${pad.b}px ${pad.l}px;">
-              <table class="mb-hero-overlay-card fluid rounded-corner" border="0" cellpadding="0" cellspacing="0"
+              <table class="blackbg mb-hero-overlay-card fluid rounded-corner" border="0" cellpadding="0" cellspacing="0"
                 bgcolor="${overlayHex}"
                 style="background:${overlayRgba};background-color:${overlayRgba};width:${overlayWidth}px;border-radius:${overlayRadius}px;"
                 width="${overlayWidth}">

@@ -63,11 +63,16 @@ export function PropertyPanel() {
   }
 
   return (
-    // Mobile: bottom drawer (fixed bottom, half-viewport height with scroll).
-    // Desktop: right-side fixed-width column. The drawer auto-appears when
-    // a module is selected and tucks away when nothing is selected (the
-    // empty state above returns null on mobile).
-    <aside className="fixed inset-x-0 bottom-0 z-30 flex max-h-[60vh] w-full shrink-0 flex-col border-t border-stone-200 bg-white shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.12)] md:static md:inset-auto md:z-auto md:h-full md:w-[320px] md:max-h-none md:border-l md:border-t-0 md:shadow-none">
+    // Mobile: bottom drawer with grab handle, safe-area padding for the
+    // home indicator, max 70% of viewport so the canvas stays visible
+    // behind it for context. Desktop: right-side fixed-width column.
+    <aside
+      className="fixed inset-x-0 bottom-0 z-30 flex max-h-[70vh] w-full shrink-0 flex-col rounded-t-2xl border-t border-stone-200 bg-white shadow-[0_-12px_32px_-8px_rgba(0,0,0,0.15)] md:static md:inset-auto md:z-auto md:h-full md:w-[320px] md:max-h-none md:rounded-none md:border-l md:border-t-0 md:shadow-none"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      {/* Grab handle — visual affordance for "this slides up from the
+          bottom". Hidden on desktop. */}
+      <div className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-stone-300 md:hidden" aria-hidden="true" />
       <header className="border-b border-stone-200 px-4 py-3">
         <p className="text-[10px] font-semibold uppercase tracking-wide text-stone-400">
           {module.category}

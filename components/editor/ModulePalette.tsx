@@ -149,9 +149,17 @@ export function ModulePalette() {
         )}
       </div>
 
-      {/* MOBILE: horizontal scrollable pill bar. Tap to add (no drag — touch
-           drag-drop is unreliable on phones and gets fighty with scroll). */}
-      <div className="flex min-w-0 flex-1 items-stretch gap-2 overflow-x-auto px-3 py-2 md:hidden">
+      {/* MOBILE: horizontal scrollable pill bar with proper touch targets
+          (44×44 Apple HIG minimum), category-prefixed labels for context,
+          and safe-area padding on the left so the first pill clears the
+          iPhone notch. Tap to add — touch drag-drop fights with scroll. */}
+      <div
+        className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-3 md:hidden"
+        style={{
+          paddingLeft: "max(12px, env(safe-area-inset-left))",
+          paddingRight: "max(12px, env(safe-area-inset-right))",
+        }}
+      >
         {flat.length === 0 ? (
           <div className="flex items-center justify-center px-3 text-xs text-stone-500">
             No modules
@@ -162,10 +170,13 @@ export function ModulePalette() {
               key={m.id}
               type="button"
               onClick={() => add(m.id)}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-800 transition active:scale-[0.97] active:bg-stone-100"
+              className="group inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-stone-200 bg-white px-4 text-[13px] font-medium text-stone-800 shadow-[0_1px_0_rgba(28,25,23,0.04)] transition active:scale-[0.97] active:bg-stone-100"
             >
-              <Plus size={12} className="text-stone-400" />
-              {m.label}
+              <Plus size={14} className="text-stone-400 transition group-active:text-stone-700" />
+              <span className="whitespace-nowrap">{m.label}</span>
+              <span className="ml-1 hidden text-[10px] font-normal uppercase tracking-wider text-stone-400 xs:inline">
+                {m.category}
+              </span>
             </button>
           ))
         )}

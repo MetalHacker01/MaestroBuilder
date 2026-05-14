@@ -297,13 +297,13 @@ export function wrapMjml(body: string, options: ShellOptions = {}): string {
           <!--[if mso]>
           <style>
             /* Schneider's .blackbg MSO trick (sch_email.html line 466-507):
-               on Outlook desktop, force the overlay card to a SOLID dark
-               background (rgba is dropped by Word renderer) AND nudge it
-               inward via margin so it doesn't sit flush against the bg
-               image's left edge. */
-            .mb-hero-overlay-card {
+               Outlook desktop's Word renderer drops rgba(), so we force
+               the overlay card to a solid dark background for that client.
+               The wrapping td (padding:15px 25px) already gives the visual
+               gap from the bg image's left edge — we don't add margin here
+               too, that would double-pad and push the card off-centre. */
+            .blackbg {
               background: #000 !important;
-              margin: 8px 25px !important;
             }
             .banner h1 {
               font-family: Arial, sans-serif !important;

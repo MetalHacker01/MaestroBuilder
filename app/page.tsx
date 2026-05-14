@@ -22,9 +22,12 @@ function LinkedInIcon({ size = 15 }: { size?: number }) {
 
 export default function Home() {
   return (
-    <main className="mb-grain relative flex min-h-screen flex-col bg-stone-50 text-stone-900">
-      {/* Top bar */}
-      <header className="z-10 flex items-center justify-between px-8 py-5">
+    <main className="mb-grain relative flex min-h-[100dvh] flex-col bg-stone-50 text-stone-900">
+      {/* Top bar — safe-area aware for iPhone notch */}
+      <header
+        className="z-10 flex items-center justify-between px-5 py-4 md:px-8 md:py-5"
+        style={{ paddingTop: "max(16px, env(safe-area-inset-top))" }}
+      >
         <Link
           href="/"
           className="flex items-center transition hover:opacity-80"
@@ -57,15 +60,16 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* Hero — asymmetric, copy left, mock right */}
-      <section className="relative mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-10 px-8 pb-20 pt-14 lg:grid-cols-12">
+      {/* Hero — asymmetric, copy left, mock right (mock hidden on mobile
+          where it'd be unreadable; mobile users see copy + CTAs full-bleed). */}
+      <section className="relative mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-10 px-5 pb-16 pt-8 md:px-8 md:pb-20 md:pt-14 lg:grid-cols-12">
         <div className="lg:col-span-6">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-stone-600 shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-blue-700" />
-            v0.2 · live preview · resend send-test
+            v0.2 · live preview · mailjet send-test
           </span>
 
-          <h1 className="mt-5 text-5xl font-semibold leading-[1.05] tracking-tight text-stone-900 md:text-6xl">
+          <h1 className="mt-5 text-4xl font-semibold leading-[1.05] tracking-tight text-stone-900 sm:text-5xl md:text-6xl" style={{ textWrap: "balance" } as React.CSSProperties}>
             Drag, drop, tweak.
             <br />
             <span className="italic text-stone-700">Ship emails that</span>
@@ -73,7 +77,7 @@ export default function Home() {
             render everywhere.
           </h1>
 
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-stone-600">
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-stone-600" style={{ textWrap: "pretty" } as React.CSSProperties}>
             Maestro Builder is the modern rebuild of our internal responsive-email
             tool. Compose with typed modules, edit copy with WYSIWYG, tune every
             radius and color, send a test to your inbox — then export bulletproof
@@ -98,14 +102,16 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Right side — stylized "editor" mock built in CSS, no fake screenshots */}
-        <div className="relative lg:col-span-6">
+        {/* Right side — stylized "editor" mock built in CSS, no fake
+            screenshots. Hidden on mobile because it'd compress to an
+            illegible thumbnail; mobile users see the real editor at /editor */}
+        <div className="relative hidden lg:col-span-6 lg:block">
           <EditorMock />
         </div>
       </section>
 
       {/* Feature row — asymmetric (one big + two small) */}
-      <section className="mx-auto w-full max-w-6xl px-8 pb-24">
+      <section className="mx-auto w-full max-w-6xl px-5 pb-20 md:px-8 md:pb-24">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <FeatureBig
             icon={Boxes}
@@ -127,7 +133,7 @@ export default function Home() {
 
       {/* About the maker — editorial / minimalist-ui pattern */}
       <section className="border-t border-stone-200 bg-stone-50/50">
-        <div className="mx-auto max-w-5xl px-8 py-20">
+        <div className="mx-auto max-w-5xl px-5 py-16 md:px-8 md:py-20">
           <div className="mb-8 inline-flex items-center gap-2">
             <span className="h-px w-8 bg-stone-300" />
             <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-500">
@@ -184,8 +190,11 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-stone-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-6 text-xs text-stone-500">
+      <footer
+        className="border-t border-stone-200 bg-white"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-5 py-5 text-xs text-stone-500 md:flex-row md:items-center md:px-8 md:py-6">
           <span>Maestro Builder · Internal tool for the marketing team</span>
           <span className="font-mono">v0.2</span>
         </div>

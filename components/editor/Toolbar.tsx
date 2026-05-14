@@ -114,11 +114,14 @@ export function Toolbar() {
   }
 
   return (
-    <header className="relative flex items-center justify-between gap-3 border-b border-stone-200 bg-white/85 px-3 py-2 backdrop-blur">
-      <div className="flex items-center gap-3">
+    <header
+      className="relative flex items-center justify-between gap-2 border-b border-stone-200 bg-white/85 px-3 py-2 backdrop-blur"
+      style={{ paddingTop: "max(8px, env(safe-area-inset-top))" }}
+    >
+      <div className="flex min-w-0 items-center gap-2 md:gap-3">
         <a
           href="/"
-          className="flex items-center transition hover:opacity-80"
+          className="flex shrink-0 items-center transition hover:opacity-80"
           aria-label="Home"
           title="Home"
         >
@@ -128,30 +131,36 @@ export function Toolbar() {
             width={1024}
             height={1024}
             priority
-            className="h-14 w-auto select-none"
+            className="h-9 w-auto select-none md:h-14"
           />
         </a>
-        <span className="h-9 w-px bg-stone-200" aria-hidden />
-        <div className="flex flex-col leading-tight">
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-stone-400">
+        <span className="hidden h-9 w-px bg-stone-200 md:block" aria-hidden />
+        <div className="flex min-w-0 flex-col leading-tight">
+          <span className="hidden text-[10px] font-semibold uppercase tracking-wide text-stone-400 md:block">
             Template
           </span>
           <input
             type="text"
             value={templateName}
             onChange={(e) => setName(e.target.value)}
-            className="-ml-0.5 mt-0.5 w-56 rounded bg-transparent px-0.5 text-[12px] font-medium text-stone-800 transition hover:bg-stone-100 focus:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            className="-ml-0.5 mt-0 w-full min-w-0 max-w-[44vw] rounded bg-transparent px-0.5 text-[13px] font-medium text-stone-800 transition hover:bg-stone-100 focus:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 md:mt-0.5 md:w-56 md:max-w-none md:text-[12px]"
             spellCheck={false}
+            aria-label="Template name"
           />
         </div>
       </div>
 
       <div className="flex items-center gap-1">
-        <ToolbarBtn icon={FolderOpen} label="Open" onClick={() => fileInput.current?.click()} />
-        <ToolbarBtn icon={Save} label="Save" onClick={saveJson} />
-        <ToolbarBtn icon={LinkIcon} label="Share" onClick={copyShareUrl} />
-        <ToolbarBtn icon={RotateCcw} label="Clear" onClick={clearAll} variant="ghost-danger" />
-        <span className="mx-1 h-5 w-px bg-stone-200" aria-hidden />
+        {/* Secondary actions (Open/Save/Share/Clear) hidden on mobile to
+            keep the toolbar single-line — accessible by scrolling the
+            template-name input. Re-enabled at md+. */}
+        <div className="hidden items-center gap-1 md:flex">
+          <ToolbarBtn icon={FolderOpen} label="Open" onClick={() => fileInput.current?.click()} />
+          <ToolbarBtn icon={Save} label="Save" onClick={saveJson} />
+          <ToolbarBtn icon={LinkIcon} label="Share" onClick={copyShareUrl} />
+          <ToolbarBtn icon={RotateCcw} label="Clear" onClick={clearAll} variant="ghost-danger" />
+          <span className="mx-1 h-5 w-px bg-stone-200" aria-hidden />
+        </div>
         <button
           type="button"
           aria-pressed={!!theme.darkMode}
@@ -166,7 +175,7 @@ export function Toolbar() {
               : "Add dark-mode CSS for Apple Mail / Outlook 2019 macOS / Outlook.com."
           }
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition",
+            "hidden items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition md:inline-flex",
             theme.darkMode
               ? "bg-stone-900 text-white shadow-sm hover:bg-stone-700"
               : "border border-stone-200 bg-white text-stone-700 hover:-translate-y-px hover:border-stone-300 hover:shadow-sm"
@@ -188,11 +197,11 @@ export function Toolbar() {
             />
           </span>
         </button>
-        <span className="mx-1 h-5 w-px bg-stone-200" aria-hidden />
+        <span className="mx-1 hidden h-5 w-px bg-stone-200 md:block" aria-hidden />
         <button
           type="button"
           onClick={() => setSendOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-md border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 shadow-sm transition hover:-translate-y-px hover:border-stone-300 hover:shadow"
+          className="hidden items-center gap-1.5 rounded-md border border-stone-200 bg-white px-2.5 py-1.5 text-xs font-medium text-stone-700 shadow-sm transition hover:-translate-y-px hover:border-stone-300 hover:shadow md:inline-flex"
         >
           <Send size={13} />
           Send test
@@ -201,10 +210,12 @@ export function Toolbar() {
           type="button"
           onClick={exportHtml}
           disabled={exporting}
-          className="inline-flex items-center gap-1.5 rounded-md bg-stone-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:-translate-y-px hover:bg-stone-700 disabled:opacity-60"
+          aria-label="Export HTML"
+          className="inline-flex h-9 items-center gap-1.5 rounded-md bg-stone-900 px-3 text-xs font-medium text-white shadow-sm transition hover:-translate-y-px hover:bg-stone-700 disabled:opacity-60 md:h-auto md:py-1.5"
         >
-          <Download size={13} />
-          {exporting ? "Exporting…" : "Export HTML"}
+          <Download size={14} />
+          <span className="hidden md:inline">{exporting ? "Exporting…" : "Export HTML"}</span>
+          <span className="md:hidden">{exporting ? "…" : "Export"}</span>
         </button>
       </div>
 

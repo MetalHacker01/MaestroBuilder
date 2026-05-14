@@ -153,7 +153,9 @@ export function Canvas() {
       <div
         ref={dropArea.setNodeRef}
         className={cn(
-          "relative flex flex-1 justify-center overflow-y-auto px-6 pb-10 pt-6 transition",
+          "relative flex flex-1 justify-center overflow-y-auto px-3 pb-32 pt-3 transition md:px-6 md:pb-10 md:pt-6",
+          // Bottom padding bumped on mobile so the property-panel drawer
+          // (max-h:70vh) doesn't cover the canvas tail when expanded.
           !forceDark && "mb-grain",
           dropArea.isOver && "ring-2 ring-blue-300/50 ring-inset",
           dropArea.isOver && !forceDark && "bg-blue-50/40",
@@ -162,21 +164,23 @@ export function Canvas() {
       >
         <div
           className={cn(
-            "w-full overflow-hidden rounded-xl transition-[max-width,box-shadow] duration-300 ease-out",
+            "w-full overflow-hidden rounded-lg transition-[max-width,box-shadow] duration-300 ease-out md:rounded-xl",
             widthClass,
             forceDark
               ? "bg-stone-950 shadow-[0_1px_0_rgba(0,0,0,0.6),0_18px_40px_-20px_rgba(0,0,0,0.7)]"
               : "bg-white shadow-[0_1px_0_rgba(28,25,23,0.04),0_18px_40px_-20px_rgba(28,25,23,0.18)]"
           )}
-          style={{ minHeight: "calc(100vh - 200px)" }}
+          style={{ minHeight: "calc(100dvh - 240px)" }}
         >
+          {/* `100dvh` (dynamic viewport height) so the iframe doesn't jump
+              when iOS Safari's address bar hides/shows on scroll. */}
           <iframe
             ref={iframeRef}
             title="Live email preview"
             srcDoc={html}
             onLoad={handleIframeLoad}
             className="h-full w-full border-0"
-            style={{ minHeight: "calc(100vh - 200px)" }}
+            style={{ minHeight: "calc(100dvh - 240px)" }}
           />
         </div>
 
