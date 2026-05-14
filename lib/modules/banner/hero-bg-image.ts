@@ -215,14 +215,14 @@ export const heroBgImage: Module = {
       <div>
         <table border="0" cellpadding="0" cellspacing="0" class="mobile-auto-height">
           <tr>
-            <td class="responsive-td" style="padding:${pad.t}px ${pad.r}px ${pad.b}px ${pad.l}px;">
-              <table class="blackbg mb-hero-overlay-card fluid rounded-corner" border="0" cellpadding="0" cellspacing="0"
+            <td class="side-padding-25 top-bottom-padding-15 mobile-side-padding-15" style="padding:15px 25px">
+              <table class="blackbg fluid rounded-corner" border="0" cellpadding="0" cellspacing="0"
                 bgcolor="${overlayHex}"
                 style="background:${overlayRgba};background-color:${overlayRgba};width:${overlayWidth}px;border-radius:${overlayRadius}px;"
                 width="${overlayWidth}">
                 <tr>
-                  <td style="color:${escapeAttr(p.headlineColor)};padding:20px 30px;font-family:${FONT_STACK};">
-                    <h1 style="color:${escapeAttr(p.headlineColor)};font-family:${FONT_STACK};font-size:30px;line-height:1.2;font-weight:bold;margin:0;padding-bottom:10px;">
+                  <td style="color:#ffffff;font-weight:bold;padding:10px 25px;">
+                    <h1 style="color:${escapeAttr(p.headlineColor)};padding-bottom:10px;">
                       ${safeHtml(p.headline)}
                     </h1>
                     ${p.paragraph
@@ -234,9 +234,9 @@ export const heroBgImage: Module = {
                       : ``}
                     ${showButton
                       ? `
-                    <table border="0" cellpadding="0" cellspacing="0">
+                    <table>
                       <tr>
-                        <td colspan="3" style="height:10px;line-height:10px;font-size:1px;">&nbsp;</td>
+                        <td colspan="3" style="height:5px;line-height:5px;font-size:1px;">&nbsp;</td>
                       </tr>
                       <tr>
                         <td class="responsive-td">

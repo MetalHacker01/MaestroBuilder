@@ -296,23 +296,33 @@ export function wrapMjml(body: string, options: ShellOptions = {}): string {
           <meta name="supported-color-schemes" content="${darkEnabled ? "light dark" : "light"}">
           <!--[if mso]>
           <style>
-            /* Schneider .blackbg trick (sch_email.html 466-507):
-               Outlook Word renderer drops rgba AND ignores padding on
-               td elements inside v:textbox. The wrapping td padding
-               works in webmail but Outlook acts like it is not there.
-               So we re-add the same horizontal inset as margin on
-               .blackbg for Outlook only — the two rules do not double
-               up because they apply in different clients (the MSO
-               conditional is invisible to webmail). */
+            /* VERBATIM Schneider MSO CSS (sch_email.html lines 466-507).
+               Outlook Word renderer drops rgba, ignores padding on td
+               elements inside v:textbox, and ignores margin on most
+               block elements. These rules give Outlook the spacing
+               and typography that inline styles and webmail CSS cannot
+               reach. The CRITICAL rule is the .banner .button margin
+               which insets the CTA from the overlay left edge on
+               Outlook — without it the button sits flush against the
+               overlay border. */
             .blackbg {
               background: #000 !important;
-              margin: 15px 25px !important;
+              margin: 15px 50px !important;
             }
+            h1, h2, h3, h4, h5, h6 {
+              font-family: Arial, sans-serif;
+              font-weight: bold;
+              line-height: 1.2;
+            }
+            h1 { font-size: 26px; }
+            .banner .button-outline,
+            .banner .button,
             .banner h1 {
-              font-family: Arial, sans-serif !important;
-              font-weight: bold !important;
-              font-size: 26px !important;
-              line-height: 1.2 !important;
+              margin-bottom: 20px !important;
+            }
+            .banner .button-outline,
+            .banner .button {
+              margin: 20px 0 20px 25px !important;
             }
           </style>
           <![endif]-->
@@ -322,13 +332,32 @@ export function wrapMjml(body: string, options: ShellOptions = {}): string {
           a { text-decoration: underline; }
         </mj-style>
         <mj-style>
-          /* Schneider helpers (sch_email.html): rounded-corner +
-             responsive helpers + banner h1/p margin reset so the
-             headline sits flush at the top of the rgba overlay card. */
+          /* Verbatim Schneider main stylesheet rules (sch_email.html
+             lines 105-217). These are the LIGHT-MODE webmail rules. */
           .rounded-corner { border-radius: 8px; }
           .button { cursor: pointer; }
-          .banner h1 { line-height: 1.2; margin: 0; }
+          table.button td {
+            text-align: center;
+            padding: 10px 5px;
+            border-radius: 5px;
+            line-height: 15px !important;
+            font-weight: 400;
+            max-width: 190px;
+            width: 190px;
+          }
+          .banner h1 {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            line-height: 1.2;
+            font-size: 34px;
+            margin: 0;
+          }
           .banner p { margin: 0; }
+          .banner .button-outline td { border: 2px solid #fff !important; }
+          .banner .button-outline td a,
+          .banner .button-outline td a span,
+          .banner .button td a,
+          .banner .button td a span { color: #fff !important; }
         </mj-style>
         <mj-style>
           @media (max-width:480px) {

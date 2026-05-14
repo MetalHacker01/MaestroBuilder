@@ -272,9 +272,9 @@ export function Toolbar() {
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2 px-3 pb-3">
-              <SheetBtn icon={FolderOpen} label="Open" onClick={() => { setMenuOpen(false); fileInput.current?.click(); }} />
-              <SheetBtn icon={Save} label="Save" onClick={() => { setMenuOpen(false); saveJson(); }} />
-              <SheetBtn icon={LinkIcon} label="Share" onClick={() => { setMenuOpen(false); copyShareUrl(); }} />
+              <SheetBtn icon={FolderOpen} label="Open file" onClick={() => { setMenuOpen(false); fileInput.current?.click(); }} />
+              <SheetBtn icon={Save} label="Save JSON" onClick={() => { setMenuOpen(false); saveJson(); }} />
+              <SheetBtn icon={LinkIcon} label="Share URL" onClick={() => { setMenuOpen(false); copyShareUrl(); }} />
               <SheetBtn icon={Send} label="Send test" onClick={() => { setMenuOpen(false); setSendOpen(true); }} />
               <SheetBtn
                 icon={Moon}
@@ -287,7 +287,8 @@ export function Toolbar() {
                   setMenuOpen(false);
                 }}
               />
-              <SheetBtn icon={RotateCcw} label="Clear" danger onClick={() => { setMenuOpen(false); clearAll(); }} />
+              <SheetBtn icon={Download} label={exporting ? "Exporting…" : "Export HTML"} onClick={() => { setMenuOpen(false); exportHtml(); }} />
+              <SheetBtn icon={RotateCcw} label="Clear all" danger onClick={() => { setMenuOpen(false); clearAll(); }} />
             </div>
           </div>
         </>
