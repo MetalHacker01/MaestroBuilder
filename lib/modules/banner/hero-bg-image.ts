@@ -121,12 +121,12 @@ export const heroBgImage: Module = {
     },
     ctaText: { type: "text", label: "Button text", default: "Get started", group: "Button" },
     ctaUrl: { type: "url", label: "Button link", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Button" },
-    // Default to BRAND.pop (saturated indigo) instead of BRAND.accent
-    // (off-black) — the hero overlay's default card colour is dark, so
-    // an off-black CTA disappears into it. A saturated accent stays
-    // visible against the dark card on every client.
-    ctaBgColor: { type: "color", label: "Button colour", default: BRAND.pop, group: "Button" },
-    ctaTextColor: { type: "color", label: "Button text colour", default: "#ffffff", group: "Button" },
+    // Default: WHITE button on the dark overlay card (editorial-minimalist
+    // "inverted" CTA). Black-on-dark was invisible; indigo "pop" was too
+    // saturated for the minimalist palette. White on dark gives the
+    // highest universal contrast and stays on-theme.
+    ctaBgColor: { type: "color", label: "Button colour", default: "#FFFFFF", group: "Button" },
+    ctaTextColor: { type: "color", label: "Button text colour", default: BRAND.heading, group: "Button" },
     ctaRadius: { type: "number", label: "Button radius", default: 5, min: 0, max: 32, unit: "px", group: "Button" },
     ctaWidth: { type: "number", label: "Button width", default: 180, min: 100, max: 300, unit: "px", group: "Button" },
     bannerWidth: {

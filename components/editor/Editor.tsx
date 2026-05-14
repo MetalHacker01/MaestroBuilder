@@ -130,13 +130,16 @@ export function Editor() {
         onDragEnd={onDragEnd}
         onDragCancel={() => setActiveDrag(null)}
       >
-        <div className="flex min-h-0 flex-1">
-          {/* Left rail: Modules palette + Layout outline (split vertically) */}
-          <aside className="flex w-[260px] shrink-0 flex-col border-r border-stone-200 bg-white">
-            <div className="flex min-h-0 flex-[3] flex-col">
+        {/* Layout: 3-column on desktop, vertical stack on mobile.
+             Mobile order: palette (top, horizontal scroll) → canvas → property panel.
+             The Outline list (layout/reorder) is desktop-only — on mobile users
+             reorder by selecting + tapping arrows in the property panel header. */}
+        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+          <aside className="flex shrink-0 flex-row border-b border-stone-200 bg-white md:w-[260px] md:flex-col md:border-b-0 md:border-r">
+            <div className="flex min-w-0 flex-1 flex-row md:min-h-0 md:flex-[3] md:flex-col">
               <ModulePalette />
             </div>
-            <div className="flex min-h-0 flex-[2] flex-col">
+            <div className="hidden md:flex md:min-h-0 md:flex-[2] md:flex-col">
               <Outline />
             </div>
           </aside>

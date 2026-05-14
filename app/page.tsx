@@ -140,24 +140,27 @@ export default function Home() {
                 Built by a martech engineer for the martech team.
               </h2>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-stone-600">
-                I&apos;m Aldorino Krushi — a marketing-automation engineer at
-                MarketOne International. Maestro Builder is the modern rebuild
-                of our internal jQuery-era responsive-email tool, rewritten on
-                Next.js + MJML so editors can tune every radius, padding and
-                color without ever touching HTML. Same bulletproof output,
-                better workflow.
+                I&apos;m Aldorino Rrushi — a Marketing Automation Solution
+                Engineer based in Tirana, Albania, with 7+ years of experience
+                and 7 Salesforce certifications. Maestro Builder is the modern
+                rebuild of our internal jQuery-era responsive-email tool,
+                rewritten on Next.js + MJML so editors can tune every radius,
+                padding and color without ever touching HTML. Same bulletproof
+                output across Gmail, Outlook 2007+ and mobile — much better
+                workflow.
               </p>
               <p className="mt-4 max-w-2xl text-sm leading-relaxed text-stone-500">
-                Built alongside the rest of my{" "}
+                Find the rest of my work — Salesforce Marketing Cloud
+                solutions, automation tooling, and custom integrations — on my{" "}
                 <a
-                  href="https://martech-maestro-folio-sroh.vercel.app/"
+                  href="https://github.com/MetalHacker01/aldorino_rrushi_portfolio"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-stone-700 underline decoration-stone-300 underline-offset-2 hover:decoration-stone-700"
                 >
-                  martech maestro portfolio
-                </a>{" "}
-                — open-source where possible, deployed on Vercel.
+                  portfolio repo
+                </a>
+                .
               </p>
             </div>
             <div className="lg:col-span-5">
@@ -169,16 +172,16 @@ export default function Home() {
                   hint="MetalHacker01"
                 />
                 <SocialLink
-                  href="https://www.linkedin.com/in/aldorino-krushi/"
+                  href="https://www.linkedin.com/in/aldorinorrushi/"
                   icon={LinkedInIcon}
                   label="LinkedIn"
-                  hint="aldorino-krushi"
+                  hint="aldorinorrushi"
                 />
                 <SocialLink
-                  href="https://martech-maestro-folio-sroh.vercel.app/"
+                  href="https://github.com/MetalHacker01/aldorino_rrushi_portfolio"
                   icon={Globe}
                   label="Portfolio"
-                  hint="martech-maestro-folio"
+                  hint="aldorino_rrushi_portfolio"
                 />
               </div>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Settings2, Trash2 } from "lucide-react";
+import { Settings2, Trash2, X } from "lucide-react";
 import { useEditor } from "@/lib/state/store";
 import { getModule } from "@/lib/modules/registry";
 import type { FieldSchema, Spacing } from "@/lib/modules/types";
@@ -19,6 +19,7 @@ export function PropertyPanel() {
   const instances = useEditor((s) => s.instances);
   const updateProp = useEditor((s) => s.updateProp);
   const remove = useEditor((s) => s.remove);
+  const select = useEditor((s) => s.select);
 
   const instance = useMemo(
     () => instances.find((i) => i.uid === selectedUid) ?? null,
@@ -27,8 +28,10 @@ export function PropertyPanel() {
   const module = instance ? getModule(instance.moduleId) : null;
 
   if (!instance || !module) {
+    // Empty state — hidden entirely on mobile so the canvas gets the full
+    // viewport. On desktop it stays visible as a "Nothing selected" hint.
     return (
-      <aside className="flex h-full w-[320px] shrink-0 flex-col border-l border-stone-200 bg-white">
+      <aside className="hidden h-full w-[320px] shrink-0 flex-col border-l border-stone-200 bg-white md:flex">
         <header className="border-b border-stone-200 px-4 py-3">
           <h2 className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
             Properties
@@ -60,7 +63,11 @@ export function PropertyPanel() {
   }
 
   return (
-    <aside className="flex h-full w-[320px] shrink-0 flex-col border-l border-stone-200 bg-white">
+    // Mobile: bottom drawer (fixed bottom, half-viewport height with scroll).
+    // Desktop: right-side fixed-width column. The drawer auto-appears when
+    // a module is selected and tucks away when nothing is selected (the
+    // empty state above returns null on mobile).
+    <aside className="fixed inset-x-0 bottom-0 z-30 flex max-h-[60vh] w-full shrink-0 flex-col border-t border-stone-200 bg-white shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.12)] md:static md:inset-auto md:z-auto md:h-full md:w-[320px] md:max-h-none md:border-l md:border-t-0 md:shadow-none">
       <header className="border-b border-stone-200 px-4 py-3">
         <p className="text-[10px] font-semibold uppercase tracking-wide text-stone-400">
           {module.category}
@@ -69,14 +76,25 @@ export function PropertyPanel() {
           <h2 className="truncate text-sm font-semibold text-stone-900">
             {module.label}
           </h2>
-          <button
-            type="button"
-            title="Remove module"
-            onClick={() => remove(instance.uid)}
-            className="rounded p-1 text-stone-400 transition hover:bg-red-50 hover:text-red-600"
-          >
-            <Trash2 size={14} />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              title="Close properties"
+              onClick={() => select(null)}
+              className="rounded p-1 text-stone-400 transition hover:bg-stone-100 hover:text-stone-700 md:hidden"
+              aria-label="Close properties panel"
+            >
+              <X size={14} />
+            </button>
+            <button
+              type="button"
+              title="Remove module"
+              onClick={() => remove(instance.uid)}
+              className="rounded p-1 text-stone-400 transition hover:bg-red-50 hover:text-red-600"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
         </div>
       </header>
       <div className="flex-1 overflow-y-auto">
