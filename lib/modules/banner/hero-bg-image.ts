@@ -221,7 +221,7 @@ export const heroBgImage: Module = {
                 style="background:${overlayRgba};background-color:${overlayRgba};width:${overlayWidth}px;border-radius:${overlayRadius}px;"
                 width="${overlayWidth}">
                 <tr>
-                  <td style="color:${escapeAttr(p.headlineColor)};padding:18px 28px;font-family:${FONT_STACK};">
+                  <td style="color:${escapeAttr(p.headlineColor)};padding:20px 30px;font-family:${FONT_STACK};">
                     <h1 style="color:${escapeAttr(p.headlineColor)};font-family:${FONT_STACK};font-size:30px;line-height:1.2;font-weight:bold;margin:0;padding-bottom:10px;">
                       ${safeHtml(p.headline)}
                     </h1>

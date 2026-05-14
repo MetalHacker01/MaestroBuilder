@@ -4,13 +4,15 @@ import {
   Download,
   FolderOpen,
   Link as LinkIcon,
+  Menu,
   Moon,
   RotateCcw,
   Save,
   Send,
+  X,
 } from "lucide-react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor } from "@/lib/state/store";
 import { templateSchema } from "@/lib/schema/template";
 import { buildShareUrl, URL_STATE_WARN_BYTES } from "@/lib/state/url";
@@ -29,6 +31,17 @@ export function Toolbar() {
   const [exporting, setExporting] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Close the mobile hamburger menu on Escape
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
 
   function showToast(msg: string) {
     setToast(msg);
@@ -217,7 +230,68 @@ export function Toolbar() {
           <span className="hidden md:inline">{exporting ? "Exporting…" : "Export HTML"}</span>
           <span className="md:hidden">{exporting ? "…" : "Export"}</span>
         </button>
+
+        {/* Mobile hamburger — opens a sheet containing all the actions
+            that are hidden on mobile (Open/Save/Share/Clear/Dark/Send). */}
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          aria-label="More actions"
+          aria-expanded={menuOpen}
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white text-stone-700 transition active:scale-95 active:bg-stone-100 md:hidden"
+        >
+          <Menu size={16} />
+        </button>
       </div>
+
+      {/* Mobile actions sheet */}
+      {menuOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/30 md:hidden"
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className="fixed inset-x-0 top-0 z-50 flex flex-col rounded-b-2xl border-b border-stone-200 bg-white shadow-[0_12px_32px_-8px_rgba(0,0,0,0.18)] md:hidden"
+            style={{ paddingTop: "max(8px, env(safe-area-inset-top))" }}
+            role="dialog"
+            aria-label="Editor actions"
+          >
+            <div className="flex items-center justify-between px-4 py-3">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+                Actions
+              </span>
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                aria-label="Close menu"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-stone-500 transition active:bg-stone-100"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 px-3 pb-3">
+              <SheetBtn icon={FolderOpen} label="Open" onClick={() => { setMenuOpen(false); fileInput.current?.click(); }} />
+              <SheetBtn icon={Save} label="Save" onClick={() => { setMenuOpen(false); saveJson(); }} />
+              <SheetBtn icon={LinkIcon} label="Share" onClick={() => { setMenuOpen(false); copyShareUrl(); }} />
+              <SheetBtn icon={Send} label="Send test" onClick={() => { setMenuOpen(false); setSendOpen(true); }} />
+              <SheetBtn
+                icon={Moon}
+                label={theme.darkMode ? "Dark mode: on" : "Dark mode: off"}
+                active={!!theme.darkMode}
+                onClick={() => {
+                  const next = !theme.darkMode;
+                  setTheme({ darkMode: next });
+                  showToast(next ? "Dark mode enabled" : "Dark mode disabled");
+                  setMenuOpen(false);
+                }}
+              />
+              <SheetBtn icon={RotateCcw} label="Clear" danger onClick={() => { setMenuOpen(false); clearAll(); }} />
+            </div>
+          </div>
+        </>
+      )}
 
       <input
         ref={fileInput}
@@ -273,6 +347,37 @@ function ToolbarBtn({
     >
       <Icon size={13} />
       <span>{label}</span>
+    </button>
+  );
+}
+
+/** Sheet button — bigger touch target version of ToolbarBtn for the
+ *  mobile hamburger menu. 2-column grid item, 56px tall, icon + label. */
+function SheetBtn({
+  icon: Icon,
+  label,
+  onClick,
+  active,
+  danger,
+}: {
+  icon: typeof FolderOpen;
+  label: string;
+  onClick: () => void;
+  active?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex h-14 items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 text-left text-sm font-medium text-stone-800 transition active:scale-[0.98] active:bg-stone-50",
+        active && "border-stone-900 bg-stone-900 text-white active:bg-stone-800",
+        danger && "border-red-200 text-red-700 active:bg-red-50"
+      )}
+    >
+      <Icon size={16} className="shrink-0" />
+      <span className="truncate">{label}</span>
     </button>
   );
 }

@@ -129,22 +129,22 @@ export function Canvas() {
     >
       <div
         className={cn(
-          "flex items-center justify-between border-b px-4 py-2 backdrop-blur transition-colors",
+          "flex min-w-0 items-center justify-between gap-2 border-b px-3 py-2 backdrop-blur transition-colors md:px-4",
           forceDark
             ? "border-stone-800 bg-stone-900/80 text-stone-300"
             : "border-stone-200 bg-white/80"
         )}
       >
-        <div className="flex items-center gap-3 text-xs">
+        <div className="flex min-w-0 items-center gap-2 text-xs md:gap-3">
           <RenderStatus rendering={rendering} errors={errors} dark={forceDark} />
-          <span className={forceDark ? "text-stone-600" : "text-stone-400"}>·</span>
-          <span className={forceDark ? "text-stone-400" : "text-stone-500"}>
+          <span className={cn("hidden md:inline", forceDark ? "text-stone-600" : "text-stone-400")}>·</span>
+          <span className={cn("hidden truncate md:inline", forceDark ? "text-stone-400" : "text-stone-500")}>
             {instances.length === 0
               ? "Empty canvas"
               : `${instances.length} module${instances.length === 1 ? "" : "s"}`}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <SchemeSwitch value={previewScheme} onChange={setPreviewScheme} />
           <ViewportSwitch value={viewport} onChange={setViewport} />
         </div>

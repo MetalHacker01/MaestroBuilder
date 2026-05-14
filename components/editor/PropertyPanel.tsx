@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
-import { Settings2, Trash2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Settings2, Trash2, X, ChevronDown, ChevronUp } from "lucide-react";
 import { useEditor } from "@/lib/state/store";
+import { cn } from "@/lib/utils";
 import { getModule } from "@/lib/modules/registry";
 import type { FieldSchema, Spacing } from "@/lib/modules/types";
 import { TextField } from "./fields/TextField";
@@ -20,6 +21,17 @@ export function PropertyPanel() {
   const updateProp = useEditor((s) => s.updateProp);
   const remove = useEditor((s) => s.remove);
   const select = useEditor((s) => s.select);
+  // Mobile-only collapsed state. When collapsed the drawer shrinks to a
+  // header-only strip so the canvas behind it is fully visible. Tap the
+  // header (or the expand button) to expand back. Desktop ignores this.
+  const [mobileCollapsed, setMobileCollapsed] = useState(false);
+
+  // Auto-expand the panel when the user selects a different module so they
+  // see the fields immediately (don't keep the previous module's collapsed
+  // state). Re-collapsing is their explicit action via the chevron/header.
+  useEffect(() => {
+    if (selectedUid) setMobileCollapsed(false);
+  }, [selectedUid]);
 
   const instance = useMemo(
     () => instances.find((i) => i.uid === selectedUid) ?? null,
@@ -63,46 +75,86 @@ export function PropertyPanel() {
   }
 
   return (
-    // Mobile: bottom drawer with grab handle, safe-area padding for the
-    // home indicator, max 70% of viewport so the canvas stays visible
-    // behind it for context. Desktop: right-side fixed-width column.
+    // Mobile bottom drawer with THREE states:
+    //   - Collapsed (default after tapping a module): header strip only,
+    //     canvas mostly visible. Tap header to expand.
+    //   - Expanded: 50vh — half the viewport for editing, half for canvas
+    //     visibility (was 70vh which felt suffocating).
+    //   - Closed: tap X → select(null) → empty state returns null on
+    //     mobile so the drawer disappears entirely.
+    // Safe-area-inset-bottom keeps controls clear of the iPhone home bar.
     <aside
-      className="fixed inset-x-0 bottom-0 z-30 flex max-h-[70vh] w-full shrink-0 flex-col rounded-t-2xl border-t border-stone-200 bg-white shadow-[0_-12px_32px_-8px_rgba(0,0,0,0.15)] md:static md:inset-auto md:z-auto md:h-full md:w-[320px] md:max-h-none md:rounded-none md:border-l md:border-t-0 md:shadow-none"
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-30 flex w-full shrink-0 flex-col rounded-t-2xl border-t border-stone-200 bg-white shadow-[0_-12px_32px_-8px_rgba(0,0,0,0.15)] transition-[max-height] duration-200 ease-out md:static md:inset-auto md:z-auto md:h-full md:max-h-none md:w-[320px] md:rounded-none md:border-l md:border-t-0 md:shadow-none",
+        mobileCollapsed ? "max-h-[64px]" : "max-h-[50vh]",
+        "md:max-h-none"
+      )}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      {/* Grab handle — visual affordance for "this slides up from the
-          bottom". Hidden on desktop. */}
-      <div className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-stone-300 md:hidden" aria-hidden="true" />
-      <header className="border-b border-stone-200 px-4 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-stone-400">
-          {module.category}
-        </p>
-        <div className="mt-0.5 flex items-center justify-between gap-2">
-          <h2 className="truncate text-sm font-semibold text-stone-900">
-            {module.label}
-          </h2>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              title="Close properties"
-              onClick={() => select(null)}
-              className="rounded p-1 text-stone-400 transition hover:bg-stone-100 hover:text-stone-700 md:hidden"
-              aria-label="Close properties panel"
+      {/* Tap-target header: clicking the header toggles collapsed/expanded
+          on mobile. The grab handle on top is the visual affordance. */}
+      <button
+        type="button"
+        onClick={() => setMobileCollapsed((v) => !v)}
+        aria-expanded={!mobileCollapsed}
+        aria-label={mobileCollapsed ? "Expand properties" : "Collapse properties"}
+        className="flex w-full flex-col items-stretch border-b border-stone-200 text-left md:cursor-default md:pointer-events-none md:border-b"
+      >
+        <div className="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-stone-300 md:hidden" aria-hidden="true" />
+        <div className="flex items-center justify-between gap-2 px-4 py-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-stone-400">
+              {module.category}
+            </p>
+            <h2 className="mt-0.5 truncate text-sm font-semibold text-stone-900">
+              {module.label}
+            </h2>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                setMobileCollapsed((v) => !v);
+              }}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-stone-500 transition active:bg-stone-100 md:hidden"
+              role="button"
+              aria-label={mobileCollapsed ? "Expand" : "Collapse"}
             >
-              <X size={14} />
-            </button>
-            <button
-              type="button"
+              {mobileCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </span>
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                remove(instance.uid);
+              }}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-stone-500 transition active:bg-red-50 active:text-red-600 hover:bg-red-50 hover:text-red-600 md:h-7 md:w-7"
+              role="button"
+              aria-label="Remove module"
               title="Remove module"
-              onClick={() => remove(instance.uid)}
-              className="rounded p-1 text-stone-400 transition hover:bg-red-50 hover:text-red-600"
             >
               <Trash2 size={14} />
-            </button>
+            </span>
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                select(null);
+              }}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-stone-500 transition active:bg-stone-100 md:hidden"
+              role="button"
+              aria-label="Close properties panel"
+              title="Close"
+            >
+              <X size={16} />
+            </span>
           </div>
         </div>
-      </header>
-      <div className="flex-1 overflow-y-auto">
+      </button>
+      <div
+        className={cn(
+          "flex-1 overflow-y-auto",
+          mobileCollapsed && "hidden md:block"
+        )}
+      >
         {Object.entries(grouped).map(([group, fields]) => (
           <div key={group} className="border-b border-stone-100 px-4 py-3 last:border-0">
             <h3 className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-stone-400">

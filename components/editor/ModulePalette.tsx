@@ -94,7 +94,7 @@ export function ModulePalette() {
   }, [grouped]);
 
   return (
-    <section className="flex min-h-0 min-w-0 flex-1 flex-col bg-white">
+    <section className="flex min-h-0 min-w-0 max-w-full flex-1 flex-col overflow-hidden bg-white md:overflow-visible">
       {/* DESKTOP: vertical grouped list with header + search */}
       <header className="hidden px-3 pb-2 pt-3 md:block">
         <div className="flex items-center justify-between">

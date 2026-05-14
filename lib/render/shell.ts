@@ -296,14 +296,17 @@ export function wrapMjml(body: string, options: ShellOptions = {}): string {
           <meta name="supported-color-schemes" content="${darkEnabled ? "light dark" : "light"}">
           <!--[if mso]>
           <style>
-            /* Schneider's .blackbg MSO trick (sch_email.html line 466-507):
-               Outlook desktop's Word renderer drops rgba(), so we force
-               the overlay card to a solid dark background for that client.
-               The wrapping td (padding:15px 25px) already gives the visual
-               gap from the bg image's left edge — we don't add margin here
-               too, that would double-pad and push the card off-centre. */
+            /* Schneider .blackbg trick (sch_email.html 466-507):
+               Outlook Word renderer drops rgba AND ignores padding on
+               td elements inside v:textbox. The wrapping td padding
+               works in webmail but Outlook acts like it is not there.
+               So we re-add the same horizontal inset as margin on
+               .blackbg for Outlook only — the two rules do not double
+               up because they apply in different clients (the MSO
+               conditional is invisible to webmail). */
             .blackbg {
               background: #000 !important;
+              margin: 15px 25px !important;
             }
             .banner h1 {
               font-family: Arial, sans-serif !important;

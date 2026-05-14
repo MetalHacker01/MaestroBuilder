@@ -134,9 +134,13 @@ export function Editor() {
              Mobile order: palette (top, horizontal scroll) → canvas → property panel.
              The Outline list (layout/reorder) is desktop-only — on mobile users
              reorder by selecting + tapping arrows in the property panel header. */}
-        <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-          <aside className="flex shrink-0 flex-row border-b border-stone-200 bg-white md:w-[260px] md:flex-col md:border-b-0 md:border-r">
-            <div className="flex min-w-0 flex-1 flex-row md:min-h-0 md:flex-[3] md:flex-col">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col md:flex-row">
+          {/* Aside: full-width top bar on mobile, fixed-width left rail on
+              md+. `w-full min-w-0` + `max-w-full` on mobile is what forces
+              the horizontal-scroll pill container inside to clip overflow
+              instead of stretching the entire layout sideways. */}
+          <aside className="flex w-full min-w-0 max-w-full shrink-0 flex-row overflow-hidden border-b border-stone-200 bg-white md:w-[260px] md:max-w-none md:flex-col md:overflow-visible md:border-b-0 md:border-r">
+            <div className="flex min-w-0 flex-1 flex-row overflow-hidden md:min-h-0 md:flex-[3] md:flex-col md:overflow-visible">
               <ModulePalette />
             </div>
             <div className="hidden md:flex md:min-h-0 md:flex-[2] md:flex-col">
