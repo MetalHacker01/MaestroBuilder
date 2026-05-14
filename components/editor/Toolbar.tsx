@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useEditor } from "@/lib/state/store";
 import { templateSchema } from "@/lib/schema/template";
 import { buildShareUrl, URL_STATE_WARN_BYTES } from "@/lib/state/url";
@@ -32,6 +33,14 @@ export function Toolbar() {
   const [sendOpen, setSendOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
+
+  // Defer portal mount until after first render — `document` is not
+  // available during SSR, and accessing `document.body` before hydration
+  // would mismatch the server-rendered tree.
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
 
   // Close the mobile hamburger menu on Escape
   useEffect(() => {
@@ -41,6 +50,17 @@ export function Toolbar() {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
+  // Lock body scroll while the menu is open so the page underneath
+  // doesn't scroll when the user drags inside the overlay.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [menuOpen]);
 
   function showToast(msg: string) {
@@ -244,22 +264,27 @@ export function Toolbar() {
         </button>
       </div>
 
-      {/* Mobile actions — FULL-SCREEN overlay that paints on top of the
-          entire editor. Previous "top-anchored sheet" pattern was getting
-          clipped because the editor's flex chain below sets overflow
-          constraints; a fixed-inset-0 modal escapes all of that. The
-          backdrop and the panel are siblings inside the same Portal-less
-          conditional so z-index ordering is deterministic (40 backdrop,
-          50 panel). */}
-      {menuOpen && (
+      {/* Mobile actions — FULL-SCREEN overlay portalled into <body>.
+       *
+       * Why createPortal: the parent <header> has `backdrop-blur` which
+       * creates a CSS stacking context. Any `z-index` set inside that
+       * stacking context is relative to the header — and the ModulePalette
+       * + Canvas that come later in DOM order, with z-index auto, paint
+       * on top because they're in the outer (root) stacking context.
+       *
+       * Rendering the overlay as a direct child of document.body via
+       * createPortal lifts it out of the header's stacking context, so
+       * `z-[100]` competes at the root level and beats the palette/canvas
+       * regardless of their stacking contexts. */}
+      {menuOpen && portalReady && createPortal(
         <>
           <div
-            className="fixed inset-0 z-[60] bg-black/45 md:hidden"
+            className="fixed inset-0 z-[100] bg-black/45 md:hidden"
             onClick={() => setMenuOpen(false)}
             aria-hidden="true"
           />
           <div
-            className="fixed inset-0 z-[70] flex flex-col bg-white md:hidden"
+            className="fixed inset-0 z-[101] flex flex-col bg-white md:hidden"
             style={{
               paddingTop: "max(12px, env(safe-area-inset-top))",
               paddingBottom: "env(safe-area-inset-bottom)",
@@ -311,7 +336,8 @@ export function Toolbar() {
               </p>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
 
       <input

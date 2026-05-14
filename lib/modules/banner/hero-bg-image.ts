@@ -119,6 +119,15 @@ export const heroBgImage: Module = {
       ],
       group: "Button",
     },
+    ctaInset: {
+      type: "number",
+      label: "CTA left inset (from overlay edge)",
+      default: 25,
+      min: 0,
+      max: 80,
+      unit: "px",
+      group: "Button",
+    },
     ctaText: { type: "text", label: "Button text", default: "Get started", group: "Button" },
     ctaUrl: { type: "url", label: "Button link", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Button" },
     // Default: BRAND.pop (blue-700 #1d4ed8 — matches the landing page's
@@ -160,6 +169,7 @@ export const heroBgImage: Module = {
     const ctaFg = String(p.ctaTextColor ?? "#ffffff");
     const ctaRadiusPx = Number(p.ctaRadius ?? 5);
     const ctaWidthPx = Number(p.ctaWidth ?? 180);
+    const ctaInset = Math.max(0, Number(p.ctaInset ?? 25));
 
     const bgImage = escapeAttr(p.imageUrl);
     const bgFallback = escapeAttr(p.bgFallback);
@@ -171,13 +181,33 @@ export const heroBgImage: Module = {
       l: 25,
     };
 
-    // Schneider's exact button markup — display:inline-block on the outer
-    // table makes the button flow naturally in the cell, and the td has
-    // explicit width:180px so it doesn't stretch to fill its parent.
+    // CTA button markup.
+    //
+    // The CTA's left-inset is set INLINE on the button table itself
+    // (`margin-left:${ctaInset}px`). Earlier approaches:
+    //   1. `.banner .button { margin: 0 0 0 25px }` inside the MSO
+    //      conditional (Schneider's original): worked in Outlook desktop
+    //      Word renderer, but Outlook 365 web / Outlook Mac / Outlook iOS
+    //      strip `<!--[if mso]>` blocks entirely, so the rule never fired
+    //      and the CTA sat flush-left against the overlay's rounded edge.
+    //   2. A sibling `<td width="N">` spacer column: works for column
+    //      positioning, BUT in Outlook 2007-2016 a parent table's `background`
+    //      (rgba or otherwise) does NOT paint behind nested tables — only
+    //      behind direct text content. So the spacer-td showed the hero
+    //      background image bleeding through where the overlay should have
+    //      been opaque.
+    // Inline `margin-left` on a `<table>` is the one technique that:
+    //   (a) is honoured by every Outlook build (Word renderer treats the
+    //       inline-block table as a block-level element and respects table
+    //       margin-left);
+    //   (b) works in webmail (the inline-block table is shifted right by
+    //       the margin amount);
+    //   (c) doesn't introduce a sibling cell that could punch a hole in
+    //       the overlay paint.
     const buttonHtml = showButton
       ? `
         <table class="button" cellpadding="0" cellspacing="0" border="0"
-          style="display:inline-block;max-width:250px;">
+          style="display:inline-block;max-width:250px;margin-left:${ctaInset}px;">
           <tr>
             <td bgcolor="${ctaBg}" valign="middle"
               style="background-color:${ctaBg};font-family:${FONT_STACK};font-size:14px;text-align:center;vertical-align:middle;color:${ctaFg};display:block;padding:10px 5px;border-radius:${ctaRadiusPx}px;line-height:15px;font-weight:400;max-width:250px;width:${ctaWidthPx}px;">
@@ -233,17 +263,17 @@ export const heroBgImage: Module = {
                       : ``}
                     ${showButton
                       ? `
-                    <table>
+                    <table border="0" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td colspan="3" style="height:5px;line-height:5px;font-size:1px;">&nbsp;</td>
+                        <td style="height:8px;line-height:8px;font-size:1px;">&nbsp;</td>
                       </tr>
                       <tr>
-                        <td class="responsive-td">
+                        <td class="responsive-td" align="left" valign="middle">
                           ${buttonHtml}
                         </td>
                       </tr>
                       <tr>
-                        <td colspan="3" style="height:5px;line-height:5px;font-size:1px;">&nbsp;</td>
+                        <td style="height:8px;line-height:8px;font-size:1px;">&nbsp;</td>
                       </tr>
                     </table>
                     `

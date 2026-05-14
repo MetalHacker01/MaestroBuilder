@@ -20,6 +20,23 @@ function LinkedInIcon({ size = 15 }: { size?: number }) {
   );
 }
 
+/* Lightning-bolt mark for the footer credit. Inline SVG so we can
+ * animate the gradient + drive its colour from CSS hover state. */
+function BoltIcon({ size = 13 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[8deg]"
+    >
+      <path d="M13.5 1L3.5 13.5c-.45.56-.05 1.4.67 1.4H9l-1.6 8.04c-.18.9.94 1.43 1.51.71L20 10.5c.45-.56.05-1.4-.67-1.4H15l1.5-7.16c.18-.9-.94-1.43-1.5-.93z" />
+    </svg>
+  );
+}
+
 export default function Home() {
   return (
     <main className="mb-grain relative flex min-h-[100dvh] flex-col bg-stone-50 text-stone-900">
@@ -173,10 +190,10 @@ export default function Home() {
                   hint="MetalHacker01"
                 />
                 <SocialLink
-                  href="https://www.linkedin.com/in/aldorinorrushi/"
+                  href="https://www.linkedin.com/in/aldorino-rrushi/"
                   icon={LinkedInIcon}
                   label="LinkedIn"
-                  hint="aldorinorrushi"
+                  hint="aldorino-rrushi"
                 />
                 <SocialLink
                   href="https://martech-maestro-folio-sroh.vercel.app/"
@@ -191,12 +208,59 @@ export default function Home() {
       </section>
 
       <footer
-        className="border-t border-stone-200 bg-white"
+        className="relative overflow-hidden border-t border-stone-200 bg-white"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-5 py-5 text-xs text-stone-500 md:flex-row md:items-center md:px-8 md:py-6">
-          <span>Maestro Builder · Internal tool for the marketing team</span>
-          <span className="font-mono">v0.2</span>
+        {/* Subtle diagonal hatch in the background — gives the footer
+            a workshop / engineering bench feel without screaming. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(135deg, #1c1917 0 1px, transparent 1px 9px)",
+          }}
+        />
+        <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-4 px-5 py-7 text-xs text-stone-500 md:flex-row md:justify-between md:px-8 md:py-8">
+          {/* Left: product tagline with a tiny dev-symbol prefix */}
+          <span className="flex items-center gap-2">
+            <span className="font-mono text-[10px] text-stone-400" aria-hidden>
+              {"</>"}
+            </span>
+            <span className="text-stone-600">
+              Maestro Builder
+              <span className="mx-1.5 text-stone-300">·</span>
+              <span className="text-stone-500">Internal tool for the marketing team</span>
+            </span>
+          </span>
+
+          {/* Center: credit — bolt + name + year, clickable to LinkedIn */}
+          <a
+            href="https://www.linkedin.com/in/aldorino-rrushi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50/60 px-3.5 py-1.5 text-stone-600 shadow-[0_1px_0_rgba(28,25,23,0.04)] transition hover:-translate-y-px hover:border-stone-300 hover:bg-white hover:text-stone-900 hover:shadow-sm"
+            aria-label="Developed by Aldorino Rrushi — opens LinkedIn in a new tab"
+          >
+            <span className="text-amber-500 transition-colors group-hover:text-blue-700">
+              <BoltIcon />
+            </span>
+            <span className="text-[11px] tracking-wide">
+              <span className="text-stone-500">Developed by</span>{" "}
+              <span className="font-medium text-stone-800 group-hover:text-stone-900">
+                Aldorino Rrushi
+              </span>
+            </span>
+            <span className="font-mono text-[10px] text-stone-400 group-hover:text-stone-500">
+              · 2026
+            </span>
+          </a>
+
+          {/* Right: version chip with a small terminal cursor */}
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-stone-500">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-700/80 shadow-[0_0_8px_rgba(29,78,216,0.5)]" />
+            v0.2
+          </span>
         </div>
       </footer>
     </main>

@@ -364,6 +364,7 @@ export function wrapMjml(body: string, options: ShellOptions = {}): string {
             .mj-full-width-mobile { width: 100% !important; max-width: 100% !important; }
             .fluid { width: 100% !important; max-width: 100% !important; }
             .mobile-auto-height { height: auto !important; }
+            .mobile-hidden { display: none !important; mso-hide: all; max-height: 0 !important; overflow: hidden !important; }
             .responsive-td {
               margin: 0 auto !important;
               max-width: 100% !important;
