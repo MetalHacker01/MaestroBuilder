@@ -208,57 +208,47 @@ export default function Home() {
       </section>
 
       <footer
-        className="relative overflow-hidden border-t border-stone-200 bg-white"
+        className="mt-auto border-t border-stone-200 bg-stone-900 text-stone-300"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        {/* Subtle diagonal hatch in the background — gives the footer
-            a workshop / engineering bench feel without screaming. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(135deg, #1c1917 0 1px, transparent 1px 9px)",
-          }}
-        />
-        <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-4 px-5 py-7 text-xs text-stone-500 md:flex-row md:justify-between md:px-8 md:py-8">
-          {/* Left: product tagline with a tiny dev-symbol prefix */}
+        <div className="mx-auto flex min-h-[88px] max-w-6xl flex-col items-center justify-center gap-4 px-5 py-7 text-xs md:flex-row md:justify-between md:px-8 md:py-8">
+          {/* Left — product tagline with a tiny dev-symbol prefix */}
           <span className="flex items-center gap-2">
-            <span className="font-mono text-[10px] text-stone-400" aria-hidden>
+            <span className="font-mono text-[10px] text-stone-500" aria-hidden>
               {"</>"}
             </span>
-            <span className="text-stone-600">
-              Maestro Builder
-              <span className="mx-1.5 text-stone-300">·</span>
-              <span className="text-stone-500">Internal tool for the marketing team</span>
+            <span>
+              <span className="text-stone-200">Maestro Builder</span>
+              <span className="mx-1.5 text-stone-600">·</span>
+              <span className="text-stone-400">Internal tool for the marketing team</span>
             </span>
           </span>
 
-          {/* Center: credit — bolt + name + year, clickable to LinkedIn */}
+          {/* Center — bolt + name + year, clickable to LinkedIn */}
           <a
             href="https://www.linkedin.com/in/aldorino-rrushi/"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50/60 px-3.5 py-1.5 text-stone-600 shadow-[0_1px_0_rgba(28,25,23,0.04)] transition hover:-translate-y-px hover:border-stone-300 hover:bg-white hover:text-stone-900 hover:shadow-sm"
+            className="group inline-flex items-center gap-2 rounded-full border border-stone-700 bg-stone-800/80 px-3.5 py-1.5 text-stone-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:-translate-y-px hover:border-stone-600 hover:bg-stone-800 hover:text-white"
             aria-label="Developed by Aldorino Rrushi — opens LinkedIn in a new tab"
           >
-            <span className="text-amber-500 transition-colors group-hover:text-blue-700">
+            <span className="text-amber-400 transition-colors group-hover:text-blue-400">
               <BoltIcon />
             </span>
             <span className="text-[11px] tracking-wide">
-              <span className="text-stone-500">Developed by</span>{" "}
-              <span className="font-medium text-stone-800 group-hover:text-stone-900">
+              <span className="text-stone-400">Developed by</span>{" "}
+              <span className="font-medium text-stone-100 group-hover:text-white">
                 Aldorino Rrushi
               </span>
             </span>
-            <span className="font-mono text-[10px] text-stone-400 group-hover:text-stone-500">
+            <span className="font-mono text-[10px] text-stone-500 group-hover:text-stone-400">
               · 2026
             </span>
           </a>
 
-          {/* Right: version chip with a small terminal cursor */}
-          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-stone-500">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-700/80 shadow-[0_0_8px_rgba(29,78,216,0.5)]" />
+          {/* Right — version chip with glowing accent dot */}
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-stone-400">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.7)]" />
             v0.2
           </span>
         </div>
