@@ -244,51 +244,71 @@ export function Toolbar() {
         </button>
       </div>
 
-      {/* Mobile actions sheet */}
+      {/* Mobile actions — FULL-SCREEN overlay that paints on top of the
+          entire editor. Previous "top-anchored sheet" pattern was getting
+          clipped because the editor's flex chain below sets overflow
+          constraints; a fixed-inset-0 modal escapes all of that. The
+          backdrop and the panel are siblings inside the same Portal-less
+          conditional so z-index ordering is deterministic (40 backdrop,
+          50 panel). */}
       {menuOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/30 md:hidden"
+            className="fixed inset-0 z-[60] bg-black/45 md:hidden"
             onClick={() => setMenuOpen(false)}
             aria-hidden="true"
           />
           <div
-            className="fixed inset-x-0 top-0 z-50 flex flex-col rounded-b-2xl border-b border-stone-200 bg-white shadow-[0_12px_32px_-8px_rgba(0,0,0,0.18)] md:hidden"
-            style={{ paddingTop: "max(8px, env(safe-area-inset-top))" }}
+            className="fixed inset-0 z-[70] flex flex-col bg-white md:hidden"
+            style={{
+              paddingTop: "max(12px, env(safe-area-inset-top))",
+              paddingBottom: "env(safe-area-inset-bottom)",
+            }}
             role="dialog"
+            aria-modal="true"
             aria-label="Editor actions"
           >
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
-                Actions
-              </span>
+            <header className="flex items-center justify-between border-b border-stone-200 px-4 py-3">
+              <div>
+                <span className="block text-[10px] font-semibold uppercase tracking-wide text-stone-400">
+                  Editor
+                </span>
+                <span className="block text-base font-semibold text-stone-900">
+                  Actions
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
                 aria-label="Close menu"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-stone-500 transition active:bg-stone-100"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md text-stone-600 transition active:bg-stone-100"
               >
-                <X size={16} />
+                <X size={18} />
               </button>
-            </div>
-            <div className="grid grid-cols-2 gap-2 px-3 pb-3">
-              <SheetBtn icon={FolderOpen} label="Open file" onClick={() => { setMenuOpen(false); fileInput.current?.click(); }} />
-              <SheetBtn icon={Save} label="Save JSON" onClick={() => { setMenuOpen(false); saveJson(); }} />
-              <SheetBtn icon={LinkIcon} label="Share URL" onClick={() => { setMenuOpen(false); copyShareUrl(); }} />
-              <SheetBtn icon={Send} label="Send test" onClick={() => { setMenuOpen(false); setSendOpen(true); }} />
-              <SheetBtn
-                icon={Moon}
-                label={theme.darkMode ? "Dark mode: on" : "Dark mode: off"}
-                active={!!theme.darkMode}
-                onClick={() => {
-                  const next = !theme.darkMode;
-                  setTheme({ darkMode: next });
-                  showToast(next ? "Dark mode enabled" : "Dark mode disabled");
-                  setMenuOpen(false);
-                }}
-              />
-              <SheetBtn icon={Download} label={exporting ? "Exporting…" : "Export HTML"} onClick={() => { setMenuOpen(false); exportHtml(); }} />
-              <SheetBtn icon={RotateCcw} label="Clear all" danger onClick={() => { setMenuOpen(false); clearAll(); }} />
+            </header>
+            <div className="flex-1 overflow-y-auto px-4 py-4">
+              <div className="grid grid-cols-2 gap-3">
+                <SheetBtn icon={FolderOpen} label="Open file" onClick={() => { setMenuOpen(false); fileInput.current?.click(); }} />
+                <SheetBtn icon={Save} label="Save JSON" onClick={() => { setMenuOpen(false); saveJson(); }} />
+                <SheetBtn icon={LinkIcon} label="Share URL" onClick={() => { setMenuOpen(false); copyShareUrl(); }} />
+                <SheetBtn icon={Send} label="Send test" onClick={() => { setMenuOpen(false); setSendOpen(true); }} />
+                <SheetBtn
+                  icon={Moon}
+                  label={theme.darkMode ? "Dark: on" : "Dark: off"}
+                  active={!!theme.darkMode}
+                  onClick={() => {
+                    const next = !theme.darkMode;
+                    setTheme({ darkMode: next });
+                    showToast(next ? "Dark mode enabled" : "Dark mode disabled");
+                    setMenuOpen(false);
+                  }}
+                />
+                <SheetBtn icon={Download} label={exporting ? "Exporting…" : "Export HTML"} onClick={() => { setMenuOpen(false); exportHtml(); }} />
+                <SheetBtn icon={RotateCcw} label="Clear all" danger onClick={() => { setMenuOpen(false); clearAll(); }} />
+              </div>
+              <p className="mt-6 text-center text-[11px] leading-relaxed text-stone-400">
+                Tap anywhere outside or the × to close
+              </p>
             </div>
           </div>
         </>

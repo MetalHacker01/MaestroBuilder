@@ -27,13 +27,11 @@ export const bodyBulletsNumbered: Module = {
     step2: { type: "richtext", label: "Step 2", default: "Scan the QR code that appears on screen.", group: "Steps" },
     step3: { type: "richtext", label: "Step 3", default: "Sign in with your account and confirm the device pairing.", group: "Steps" },
     step4: { type: "richtext", label: "Step 4", default: "Personalise your preferences in <strong>Settings</strong>.", group: "Steps" },
-    // Default to forest green (#346538, minimalist-ui pale-green text
-    // colour). A saturated mid-tone is visible on BOTH a light page
-    // (contrasts with white) AND a dark page (Outlook desktop has no
-    // dark-mode @media support, so an off-black bullet would blend into
-    // the dark page bg). Green is on-theme for the editorial palette
-    // and skips the purple/cyan family entirely.
-    bulletColor: { type: "color", label: "Number circle colour", default: "#346538", group: "Style" },
+    // Default to BRAND.pop (blue-700 #1d4ed8) — matches the brand colour
+    // used by the landing page's primary CTA so the email and the site
+    // read as one project. Saturated mid-tone is visible on both light
+    // and dark backgrounds without depending on @media support.
+    bulletColor: { type: "color", label: "Number circle colour", default: BRAND.pop, group: "Style" },
     bulletTextColor: { type: "color", label: "Number text colour", default: "#ffffff", group: "Style" },
     textColor: { type: "color", label: "Step text colour", default: BRAND.text, group: "Style" },
     bgColor: { type: "color", label: "Background", default: BRAND.surface, group: "Style" },

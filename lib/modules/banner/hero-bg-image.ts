@@ -121,12 +121,11 @@ export const heroBgImage: Module = {
     },
     ctaText: { type: "text", label: "Button text", default: "Get started", group: "Button" },
     ctaUrl: { type: "url", label: "Button link", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Button" },
-    // Default: WHITE button on the dark overlay card (editorial-minimalist
-    // "inverted" CTA). Black-on-dark was invisible; indigo "pop" was too
-    // saturated for the minimalist palette. White on dark gives the
-    // highest universal contrast and stays on-theme.
-    ctaBgColor: { type: "color", label: "Button colour", default: "#FFFFFF", group: "Button" },
-    ctaTextColor: { type: "color", label: "Button text colour", default: BRAND.heading, group: "Button" },
+    // Default: BRAND.pop (blue-700 #1d4ed8 — matches the landing page's
+    // primary CTA). Visible against the dark overlay, on-theme with the
+    // rest of the site.
+    ctaBgColor: { type: "color", label: "Button colour", default: BRAND.pop, group: "Button" },
+    ctaTextColor: { type: "color", label: "Button text colour", default: "#ffffff", group: "Button" },
     ctaRadius: { type: "number", label: "Button radius", default: 5, min: 0, max: 32, unit: "px", group: "Button" },
     ctaWidth: { type: "number", label: "Button width", default: 180, min: 100, max: 300, unit: "px", group: "Button" },
     bannerWidth: {

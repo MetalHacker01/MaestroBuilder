@@ -30,7 +30,10 @@ export const BRAND = {
   accent: "#111111",
   accentDark: "#000000",
   accentSoft: "#F7F6F3",
-  pop: "#5B5BD6",
+  // `pop` matches the landing page's primary CTA (Tailwind blue-700 #1d4ed8)
+  // so the brand reads as one project — was indigo #5B5BD6 which the user
+  // flagged as "purple/cyan", off-theme from the actual webpage palette.
+  pop: "#1d4ed8",
   heading: "#111111",
   text: "#2F3437",
   muted: "#787774",
