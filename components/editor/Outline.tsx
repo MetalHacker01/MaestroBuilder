@@ -31,20 +31,43 @@ export function Outline() {
         dropZone.isOver && "bg-blue-50"
       )}
     >
-      <header className="flex items-center justify-between px-3 pb-2 pt-3">
-        <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-stone-500">
-          <Layers size={11} />
-          Layout
+      <header className="px-3 pb-2 pt-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+            <Layers size={11} />
+            Layout
+          </div>
+          <span className="font-mono text-[11px] text-stone-400">
+            {instances.length}
+          </span>
         </div>
-        <span className="font-mono text-[11px] text-stone-400">
-          {instances.length}
-        </span>
+        {instances.length > 0 && (
+          <p className="mt-1 flex items-center gap-1 text-[10.5px] leading-snug text-stone-400">
+            Drag
+            <GripVertical
+              size={10}
+              className="inline-block text-stone-400"
+              aria-hidden
+            />
+            to reorder
+            <span className="text-stone-300">·</span>
+            click to select
+          </p>
+        )}
       </header>
 
       <div className="flex-1 overflow-y-auto px-2 pb-3">
         {instances.length === 0 ? (
           <div className="mt-3 rounded-lg border border-dashed border-stone-300 bg-white px-3 py-4 text-center text-xs text-stone-500">
-            Drop modules here, or drag from above
+            Click a module on the left to add it,
+            <br />
+            or drag the
+            <GripVertical
+              size={10}
+              className="mx-1 inline-block align-text-bottom text-stone-400"
+              aria-hidden
+            />
+            handle into this list
           </div>
         ) : (
           <SortableContext items={ids} strategy={verticalListSortingStrategy}>
@@ -117,7 +140,8 @@ function OutlineCard({
     >
       <button
         type="button"
-        aria-label="Drag handle"
+        aria-label={`Drag ${m.label} to reorder`}
+        title="Drag to reorder this module in the layout"
         {...listeners}
         {...attributes}
         onClick={(e) => e.stopPropagation()}

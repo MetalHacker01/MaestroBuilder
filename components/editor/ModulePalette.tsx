@@ -113,6 +113,17 @@ export function ModulePalette() {
             {totalShown}
           </span>
         </div>
+        <p className="mt-1 flex items-center gap-1 text-[10.5px] leading-snug text-stone-400">
+          Click to append
+          <span className="text-stone-300">·</span>
+          drag
+          <GripVertical
+            size={10}
+            className="inline-block text-stone-400"
+            aria-hidden
+          />
+          to position
+        </p>
       </header>
       <div className="hidden px-2 pb-2 md:block">
         <div className="relative">
@@ -267,7 +278,7 @@ function DraggableModuleCard({
           {...listeners}
           {...attributes}
           aria-label={`Drag ${module.label} to canvas`}
-          title="Drag to canvas"
+          title={`Drag to drop ${module.label} at a specific spot in the layout`}
           className={cn(
             "flex w-7 shrink-0 cursor-grab items-center justify-center rounded-l-md border-r border-stone-100 text-stone-300 transition",
             "hover:bg-stone-100 hover:text-stone-600 active:cursor-grabbing"
@@ -279,7 +290,7 @@ function DraggableModuleCard({
           type="button"
           onClick={onAdd}
           className="flex min-w-0 flex-1 cursor-pointer items-center gap-1.5 px-2 py-1.5 text-left transition"
-          title="Click to add — drag the handle to position"
+          title={`Click to append ${module.label} to the end of the layout`}
         >
           <span className="truncate font-medium text-stone-800">{module.label}</span>
           <Plus
