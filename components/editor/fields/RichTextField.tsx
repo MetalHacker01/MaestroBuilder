@@ -16,11 +16,16 @@ type Props = {
 export function RichTextField({ label, value, onChange }: Props) {
   const editor = useTiptap({
     extensions: [
+      // Tiptap v3 StarterKit bundles a default Link extension. We need
+      // custom Link config (autolink + target=_blank) so disable the
+      // bundled one and provide our own — otherwise Tiptap warns about
+      // "Duplicate extension names found: ['link']" on every keystroke.
       StarterKit.configure({
         heading: false,
         horizontalRule: false,
         codeBlock: false,
         blockquote: false,
+        link: false,
       }),
       Link.configure({
         openOnClick: false,

@@ -2,7 +2,7 @@
 
 import { useDraggable } from "@dnd-kit/core";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { GripVertical, Plus, Search } from "lucide-react";
 import { MODULES, getDefaultProps } from "@/lib/modules/registry";
 import type { Module, ModuleCategory } from "@/lib/modules/types";
 import { useEditor } from "@/lib/state/store";
@@ -37,7 +37,15 @@ async function fetchPreview(moduleId: string): Promise<string> {
   if (inflight.has(moduleId)) return inflight.get(moduleId)!;
   const promise = (async () => {
     const props = getDefaultProps(moduleId);
-    const res = await fetch("/api/render?mode=preview", {
+    // Use mode=export (default) instead of mode=preview — the preview
+    // chrome injects a `<script>` that postMessages to the parent
+    // (intended for the main canvas iframe). In the palette hover
+    // preview that script is unused, and because the iframe is
+    // sandboxed without `allow-scripts` it produces a stream of
+    // "Blocked script execution in 'about:srcdoc'" console errors
+    // (one per palette card). Export mode emits the same compiled HTML
+    // minus the chrome script, so the popover renders identically.
+    const res = await fetch("/api/render", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -237,35 +245,48 @@ function DraggableModuleCard({
 
   return (
     <>
+      {/* Two-region card: a dedicated drag handle on the left (carries the
+       *  dnd-kit listeners + setNodeRef), and a click-to-add region for
+       *  the rest of the row. Splitting the regions eliminates the
+       *  click-vs-drag ambiguity the previous design had — every pixel
+       *  of the card has exactly one purpose, so a fast click reliably
+       *  adds and a slow drag reliably picks up. */}
       <div
-        ref={(el) => {
-          setNodeRef(el);
-          cardRef.current = el;
-        }}
-        {...listeners}
-        {...attributes}
-        onDoubleClick={onAdd}
+        ref={cardRef}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         className={cn(
-          "group relative flex cursor-grab items-center gap-2 rounded-md border border-stone-200 bg-white px-2 py-1.5 text-xs transition",
-          "hover:-translate-y-px hover:border-stone-300 hover:bg-stone-50 hover:shadow-sm active:cursor-grabbing",
+          "group relative flex items-stretch rounded-md border border-stone-200 bg-white text-xs transition",
+          "hover:-translate-y-px hover:border-stone-300 hover:bg-stone-50 hover:shadow-sm",
           isDragging && "opacity-40"
         )}
-        title="Drag to canvas, or double-click to append"
       >
-        <span className="truncate font-medium text-stone-800">{module.label}</span>
         <button
           type="button"
-          aria-label="Add module"
-          onClick={(e) => {
-            e.stopPropagation();
-            onAdd();
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          className="ml-auto inline-flex h-5 w-5 shrink-0 items-center justify-center rounded text-stone-400 opacity-0 transition hover:bg-blue-50 hover:text-blue-700 group-hover:opacity-100"
+          ref={setNodeRef}
+          {...listeners}
+          {...attributes}
+          aria-label={`Drag ${module.label} to canvas`}
+          title="Drag to canvas"
+          className={cn(
+            "flex w-7 shrink-0 cursor-grab items-center justify-center rounded-l-md border-r border-stone-100 text-stone-300 transition",
+            "hover:bg-stone-100 hover:text-stone-600 active:cursor-grabbing"
+          )}
         >
-          <Plus size={12} />
+          <GripVertical size={12} />
+        </button>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="flex min-w-0 flex-1 cursor-pointer items-center gap-1.5 px-2 py-1.5 text-left transition"
+          title="Click to add — drag the handle to position"
+        >
+          <span className="truncate font-medium text-stone-800">{module.label}</span>
+          <Plus
+            size={11}
+            className="ml-auto shrink-0 text-stone-300 transition group-hover:text-stone-600"
+            aria-hidden
+          />
         </button>
       </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useDroppable } from "@dnd-kit/core";
+import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Loader2, Monitor, Moon, Smartphone, Sun } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useEditor } from "@/lib/state/store";
@@ -32,6 +32,18 @@ export function Canvas() {
 
   const dropArea = useDroppable({ id: "canvas-drop-area" });
 
+  // Subscribe to drag-state from the parent DndContext so we can disable
+  // pointer events on the iframe during a drag. The iframe is a separate
+  // browsing context and swallows pointer events — without this, dnd-kit's
+  // `pointerWithin` collision detection can't see the cursor once it crosses
+  // into the iframe area (≈90% of the visible drop zone), so drops fail.
+  const [isDragging, setIsDragging] = useState(false);
+  useDndMonitor({
+    onDragStart: () => setIsDragging(true),
+    onDragEnd: () => setIsDragging(false),
+    onDragCancel: () => setIsDragging(false),
+  });
+
   // If template doesn't have darkMode but user wants dark preview, that's fine —
   // we force-dark in the iframe URL param regardless. But if the template is
   // configured with darkMode and user toggles preview to dark, both line up.
@@ -47,8 +59,34 @@ export function Canvas() {
     return () => clearInterval(id);
   }, []);
 
-  // Render → iframe srcDoc (debounced)
+  // Render → iframe srcDoc (debounced for typing, immediate for structure).
+  //
+  // The structureKey only changes when modules are added/removed/reordered —
+  // i.e. the drag-drop path. Typing into a property field changes the props
+  // inside an existing module but leaves the structureKey identical. We
+  // render with delay=0 on structure changes so drops feel instant, and
+  // keep the 250ms debounce on prop-only changes so typing doesn't fire
+  // a request per keystroke. Same logic for theme + forceDark toggles
+  // (single-click events, not repeated).
+  const structureKey = useMemo(
+    () => instances.map((i) => i.uid).join(","),
+    [instances]
+  );
+  const lastStructureKeyRef = useRef(structureKey);
+  const lastThemeRef = useRef(theme);
+  const lastForceDarkRef = useRef(forceDark);
+
   useEffect(() => {
+    const structureChanged = structureKey !== lastStructureKeyRef.current;
+    const themeChanged = theme !== lastThemeRef.current;
+    const darkChanged = forceDark !== lastForceDarkRef.current;
+    lastStructureKeyRef.current = structureKey;
+    lastThemeRef.current = theme;
+    lastForceDarkRef.current = forceDark;
+
+    const skipDebounce = structureChanged || themeChanged || darkChanged;
+    const delay = skipDebounce ? 0 : 250;
+
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       if (reqRef.current) reqRef.current.abort();
@@ -71,11 +109,11 @@ export function Canvas() {
         })
         .catch(() => {})
         .finally(() => setRendering(false));
-    }, 250);
+    }, delay);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [instances, theme, forceDark]);
+  }, [instances, theme, forceDark, structureKey]);
 
   // Receive postMessage from iframe (click-to-select + ready signal)
   useEffect(() => {
@@ -170,7 +208,16 @@ export function Canvas() {
               ? "bg-stone-950 shadow-[0_1px_0_rgba(0,0,0,0.6),0_18px_40px_-20px_rgba(0,0,0,0.7)]"
               : "bg-white shadow-[0_1px_0_rgba(28,25,23,0.04),0_18px_40px_-20px_rgba(28,25,23,0.18)]"
           )}
-          style={{ minHeight: "calc(100dvh - 240px)" }}
+          style={{
+            minHeight: "calc(100dvh - 240px)",
+            // While a drag is in flight, kill pointer events on the
+            // iframe wrapper so dnd-kit's collision detection (which lives
+            // in the parent window) can see the cursor as it moves over
+            // the canvas. Without this the iframe captures pointermove
+            // events and the drop zone effectively shrinks to the ~24px
+            // padding strip around the iframe.
+            pointerEvents: isDragging ? "none" : "auto",
+          }}
         >
           {/* `100dvh` (dynamic viewport height) so the iframe doesn't jump
               when iOS Safari's address bar hides/shows on scroll. */}

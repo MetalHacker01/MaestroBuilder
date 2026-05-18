@@ -36,7 +36,12 @@ export function Editor() {
   >(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    // distance:6 (was 4) — slightly more deliberate so clicks on the
+    // palette card don't accidentally pick up as drags. The drag handle
+    // is a separate region now, but a stray pointermove during a click
+    // on the click-to-add area should still resolve as a click, not a
+    // drag-cancel.
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
