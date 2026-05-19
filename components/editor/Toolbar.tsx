@@ -164,7 +164,7 @@ export function Toolbar() {
             width={1024}
             height={1024}
             priority
-            className="h-9 w-auto select-none md:h-14"
+            className="h-[18px] w-auto select-none md:h-7"
           />
         </a>
         <span className="hidden h-9 w-px bg-stone-200 md:block" aria-hidden />

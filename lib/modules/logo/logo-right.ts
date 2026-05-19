@@ -15,7 +15,7 @@ export const logoRight: Module = {
     altText: { type: "text", label: "Alt text", default: "Logo", group: "Image" },
     href: { type: "url", label: "Click-through URL", default: "https://martech-maestro-folio-sroh.vercel.app/", group: "Image" },
     width: {
-      type: "number", label: "Logo width", default: 120, min: 40, max: 600, unit: "px", group: "Image",
+      type: "number", label: "Logo width", default: 60, min: 40, max: 600, unit: "px", group: "Image",
     },
     bgColor: { type: "color", label: "Background", default: BRAND.surface, group: "Layout" },
     padding: {

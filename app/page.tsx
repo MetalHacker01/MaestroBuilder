@@ -53,10 +53,10 @@ export default function Home() {
           <Image
             src="/maestro-logo.png"
             alt="Maestro Builder"
-            width={50}
-            height={50}
+            width={25}
+            height={25}
             priority
-            className="h-[50px] w-[50px] select-none"
+            className="h-[25px] w-[25px] select-none"
           />
         </Link>
         <nav className="flex items-center gap-5 text-sm">
