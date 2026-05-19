@@ -40,7 +40,7 @@ function BoltIcon({ size = 13 }: { size?: number }) {
 export default function Home() {
   return (
     <main className="mb-grain relative flex min-h-[100dvh] flex-col bg-stone-50 text-stone-900">
-      {/* Top bar — safe-area aware for iPhone notch */}
+      {/* Top bar, safe-area aware for iPhone notch */}
       <header
         className="z-10 flex items-center justify-between px-5 py-4 md:px-8 md:py-5"
         style={{ paddingTop: "max(16px, env(safe-area-inset-top))" }}
@@ -53,10 +53,10 @@ export default function Home() {
           <Image
             src="/maestro-logo.png"
             alt="Maestro Builder"
-            width={25}
-            height={25}
+            width={50}
+            height={50}
             priority
-            className="h-[25px] w-[25px] select-none"
+            className="h-[50px] w-[50px] select-none"
           />
         </Link>
         <nav className="flex items-center gap-5 text-sm">
@@ -77,8 +77,8 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* Hero — asymmetric, copy left, mock right (mock hidden on mobile
-          where it'd be unreadable; mobile users see copy + CTAs full-bleed). */}
+      {/* Hero: asymmetric, copy left, mock right. Mock hidden on mobile
+          where it would be unreadable; mobile users see copy + CTAs full-bleed. */}
       <section className="relative mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 items-center gap-10 px-5 pb-16 pt-8 md:px-8 md:pb-20 md:pt-14 lg:grid-cols-12">
         <div className="lg:col-span-6">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-stone-600 shadow-sm">
@@ -97,7 +97,7 @@ export default function Home() {
           <p className="mt-6 max-w-xl text-base leading-relaxed text-stone-600" style={{ textWrap: "pretty" } as React.CSSProperties}>
             Maestro Builder is the modern rebuild of our internal responsive-email
             tool. Compose with typed modules, edit copy with WYSIWYG, tune every
-            radius and color, send a test to your inbox — then export bulletproof
+            radius and color, send a test to your inbox, then export bulletproof
             HTML that survives Gmail, Yahoo and Outlook&nbsp;2007+.
           </p>
 
@@ -119,36 +119,36 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Right side — stylized "editor" mock built in CSS, no fake
-            screenshots. Hidden on mobile because it'd compress to an
+        {/* Right side: stylized "editor" mock built in CSS, no fake
+            screenshots. Hidden on mobile because it would compress to an
             illegible thumbnail; mobile users see the real editor at /editor */}
         <div className="relative hidden lg:col-span-6 lg:block">
           <EditorMock />
         </div>
       </section>
 
-      {/* Feature row — asymmetric (one big + two small) */}
+      {/* Feature row: asymmetric (one big + two small) */}
       <section className="mx-auto w-full max-w-6xl px-5 pb-20 md:px-8 md:pb-24">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <FeatureBig
             icon={Boxes}
             title="Typed modules"
-            body="18 curated modules cover preheader, logo, banner, body, footer and spacers — each one a React-defined schema you can extend. Add a new module in under 100 lines."
+            body="18 curated modules cover preheader, logo, banner, body, footer and spacers. Each one is a React-defined schema you can extend. Add a new module in under 100 lines."
           />
           <FeatureSmall
             icon={Sliders}
             title="Tweak everything"
-            body="Button radius, padding, font color, alignment — all editable from a property panel that adapts to each module."
+            body="Button radius, padding, font color, alignment. All editable from a property panel that adapts to each module."
           />
           <FeatureSmall
             icon={Wand2}
             title="MJML inside"
-            body="MJML compiles your modules to bulletproof HTML — Outlook 2007 to Gmail iOS — so you don't write VML by hand."
+            body="MJML compiles your modules to bulletproof HTML, from Outlook 2007 to Gmail iOS, so you don't write VML by hand."
           />
         </div>
       </section>
 
-      {/* About the maker — editorial / minimalist-ui pattern */}
+      {/* About the maker: editorial / minimalist-ui pattern */}
       <section className="border-t border-stone-200 bg-stone-50/50">
         <div className="mx-auto max-w-5xl px-5 py-16 md:px-8 md:py-20">
           <div className="mb-8 inline-flex items-center gap-2">
@@ -163,7 +163,7 @@ export default function Home() {
                 Built by a martech engineer for the martech team.
               </h2>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-stone-600">
-                I&apos;m Aldorino Rrushi — a Solution Engineer at MarketOne
+                I&apos;m Aldorino Rrushi, a Solution Engineer at MarketOne
                 International, based in Tirana, Albania. 8+ years across
                 marketing-automation platforms (Salesforce Marketing Cloud,
                 Oracle Eloqua, Oracle Responsys, HCL Unica) with 6 Salesforce
@@ -178,7 +178,7 @@ export default function Home() {
                 jQuery-era responsive-email tool, rewritten on Next.js + MJML
                 so editors can tune every radius, padding and color without
                 ever touching HTML. Same bulletproof output across Gmail,
-                Outlook 2007+ and mobile — much better workflow.
+                Outlook 2007+ and mobile, with a much better workflow.
               </p>
             </div>
             <div className="lg:col-span-5">
@@ -212,7 +212,7 @@ export default function Home() {
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="mx-auto flex min-h-[88px] max-w-6xl flex-col items-center justify-center gap-4 px-5 py-7 text-xs md:flex-row md:justify-between md:px-8 md:py-8">
-          {/* Left — product tagline with a tiny dev-symbol prefix */}
+          {/* Left: product tagline with a tiny dev-symbol prefix */}
           <span className="flex items-center gap-2">
             <span className="font-mono text-[10px] text-stone-500" aria-hidden>
               {"</>"}
@@ -224,13 +224,13 @@ export default function Home() {
             </span>
           </span>
 
-          {/* Center — bolt + name + year, clickable to LinkedIn */}
+          {/* Center: bolt + name + year, clickable to LinkedIn */}
           <a
             href="https://www.linkedin.com/in/aldorino-rrushi/"
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex items-center gap-2 rounded-full border border-stone-700 bg-stone-800/80 px-3.5 py-1.5 text-stone-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:-translate-y-px hover:border-stone-600 hover:bg-stone-800 hover:text-white"
-            aria-label="Developed by Aldorino Rrushi — opens LinkedIn in a new tab"
+            aria-label="Developed by Aldorino Rrushi, opens LinkedIn in a new tab"
           >
             <span className="text-amber-400 transition-colors group-hover:text-blue-400">
               <BoltIcon />
@@ -246,7 +246,7 @@ export default function Home() {
             </span>
           </a>
 
-          {/* Right — version chip with glowing accent dot */}
+          {/* Right: version chip with glowing accent dot */}
           <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-stone-400">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.7)]" />
             v0.2

@@ -19,6 +19,29 @@ Format per entry:
 
 ---
 
+## 2026-05-19 — Share button gave no feedback when copying URL
+
+**Problem:** Clicking the toolbar's Share button copied the URL to the clipboard but showed no visible confirmation. Users couldn't tell whether the action succeeded.
+**Root cause:** The toast was rendered inside the `<header>` element, which has `backdrop-blur`. Backdrop-blur creates a CSS stacking context, so the toast's `z-30` was relative to the header only, and the canvas/iframe/menu rendered ABOVE it. The toast was technically painting but at the wrong layer.
+**Fix:** `components/editor/Toolbar.tsx` toast block (~line 355). Portalled the toast to `document.body` via `createPortal`, switched from `absolute` to `fixed` positioning, bumped z to `z-[110]`, added a checkmark badge so success is visually obvious, and extended the auto-dismiss from 2400ms to 3000ms. Share message now reads "Share URL copied to clipboard". The clipboard-API-failure fallback also confirms via toast after the user closes the prompt.
+**Verified by:** User clicks Share, toast appears top-center, dismisses after 3s.
+**Never regress to:** Rendering toast/notification elements inside a parent with `backdrop-filter`, `transform`, `opacity<1`, or `filter`. Use a portal to `document.body` and `fixed` positioning so the stacking context cannot trap the notification.
+
+---
+
+## 2026-05-19 — Dark-mode toggle only affected the email preview, not the app UI
+
+**Problem:** The Dark mode toggle in the toolbar made the compiled email include dark-mode CSS, but left the editor chrome (toolbar, palette, outline, property panel) in light mode. Users expected a single switch to flip the whole interface.
+**Root cause:** `theme.darkMode` was wired to the MJML compiler (`forceDark` query param) but not to the React tree. The Canvas had its own separate Light/Dark preview switch, which is correct for previewing inbox rendering, but the app shell never picked up `theme.darkMode`.
+**Fix:** Three layers:
+1. `app/globals.css`: registered Tailwind v4 `@custom-variant dark (&:where(.app-dark, .app-dark *))` and added a block of utility-class overrides that flip `bg-white`, `bg-stone-50/60/80`, `bg-stone-100`, `text-stone-{300-900}`, `border-stone-{100,200,300}`, hover states, and inputs when an ancestor has `app-dark`. CSS variables (`--color-app`, `--color-surface`, `--color-text`) also flip in the same scope.
+2. `components/editor/Editor.tsx`: subscribed to `theme.darkMode` and added a `useEffect` that toggles the `app-dark` class on `document.documentElement` so portalled elements (toast, hamburger menu, SendTestDialog) inherit it too. On unmount the class is cleaned up so the landing page never picks up app-dark styling.
+3. `bg-stone-900` deliberately not overridden: it's used both as button fill (Export HTML, Dark-toggle "on" state) and as the canvas dark-preview chrome. Keeping it dark in both modes preserves intent.
+**Verified by:** User toggles Dark mode in toolbar, whole app inverts.
+**Never regress to:** Treating `theme.darkMode` as a compile-time-only flag. The user expects the toolbar toggle to be a UI-level switch as well.
+
+---
+
 ## 2026-05-14 — Hero CTA flush against overlay edge
 
 **Problem:** The CTA button in the hero-bg-image module rendered flush against the overlay's rounded left edge in Outlook (all variants), instead of being inset ~25px.

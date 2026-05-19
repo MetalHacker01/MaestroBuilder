@@ -30,6 +30,7 @@ export function Editor() {
   const remove = useEditor((s) => s.remove);
   const selectedUid = useEditor((s) => s.selectedUid);
   const select = useEditor((s) => s.select);
+  const darkMode = useEditor((s) => s.theme.darkMode);
 
   const [activeDrag, setActiveDrag] = useState<
     { source: "palette"; moduleId: string } | { source: "canvas"; uid: string } | null
@@ -59,6 +60,24 @@ export function Editor() {
     window.history.replaceState(null, "", newUrl);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // App-wide dark mode. Toggling `theme.darkMode` from the toolbar adds
+  // `app-dark` to <html>, which flips:
+  //   1. CSS variables (--color-app, --color-surface, --color-text, ...)
+  //   2. utility-class overrides in globals.css (.app-dark .bg-white, ...)
+  //   3. anything portalled into document.body (toasts, hamburger menu,
+  //      SendTestDialog), which would otherwise live outside the
+  //      editor's DOM tree and miss any class on a wrapper div.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (darkMode) root.classList.add("app-dark");
+    else root.classList.remove("app-dark");
+    return () => {
+      // On unmount (e.g. navigating away from /editor), drop the class
+      // so the landing page never picks up app-dark styling.
+      root.classList.remove("app-dark");
+    };
+  }, [darkMode]);
 
   // Keyboard: Backspace/Delete removes selected; Escape clears selection.
   useEffect(() => {
@@ -126,7 +145,9 @@ export function Editor() {
   }
 
   return (
-    <div className="flex h-screen min-h-0 w-full flex-col bg-stone-100">
+    <div
+      className={`flex h-screen min-h-0 w-full flex-col bg-stone-100${darkMode ? " app-dark" : ""}`}
+    >
       <Toolbar />
       <DndContext
         sensors={sensors}

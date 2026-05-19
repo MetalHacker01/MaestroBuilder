@@ -65,7 +65,7 @@ export function Toolbar() {
 
   function showToast(msg: string) {
     setToast(msg);
-    setTimeout(() => setToast(null), 2400);
+    setTimeout(() => setToast(null), 3000);
   }
 
   function downloadBlob(name: string, content: string, type: string) {
@@ -134,9 +134,14 @@ export function Toolbar() {
     }
     try {
       await navigator.clipboard.writeText(url);
-      showToast("Share URL copied");
+      showToast("Share URL copied to clipboard");
     } catch {
-      window.prompt("Copy this URL:", url);
+      // navigator.clipboard fails on insecure contexts (e.g. plain http
+      // localhost on some Chrome builds). Fall back to a prompt so the
+      // URL is still recoverable, then confirm via toast so the user
+      // gets the same "yes it worked" feedback.
+      const accepted = window.prompt("Copy this URL:", url);
+      if (accepted !== null) showToast("Share URL ready to paste");
     }
   }
 
@@ -352,13 +357,44 @@ export function Toolbar() {
         }}
       />
 
-      {toast && (
+      {/* Toast notification.
+       *
+       * Portalled to <body> so it always sits above the page, regardless
+       * of where it's triggered from (the header proper or the mobile
+       * hamburger sheet). Previously it was `absolute` inside the header,
+       * which itself has `backdrop-blur` and therefore creates its own
+       * stacking context — meaning even `z-30` toasts were getting hidden
+       * behind the canvas iframe and the mobile menu. The portal lifts it
+       * out of that context entirely. */}
+      {toast && portalReady && createPortal(
         <div
           role="status"
-          className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 rounded-md bg-stone-900 px-3 py-1.5 text-[11px] font-medium text-white shadow-lg"
+          aria-live="polite"
+          className="pointer-events-none fixed left-1/2 z-[110] flex -translate-x-1/2 items-center gap-2 rounded-full border border-stone-700 bg-stone-900 px-4 py-2 text-xs font-medium text-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.45)] backdrop-blur"
+          style={{
+            top: "max(72px, env(safe-area-inset-top, 0px) + 60px)",
+          }}
         >
+          <span
+            aria-hidden
+            className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500/90 text-stone-900"
+          >
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12l5 5L20 7" />
+            </svg>
+          </span>
           {toast}
-        </div>
+        </div>,
+        document.body
       )}
 
       {sendOpen && (
