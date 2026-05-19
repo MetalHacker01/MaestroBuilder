@@ -29,6 +29,16 @@ Format per entry:
 
 ---
 
+## 2026-05-19 — App dark mode bled into the canvas
+
+**Problem:** Right after wiring `theme.darkMode` to flip the editor chrome via `.app-dark` on `<html>`, the Canvas component also went dark even when its own Light/Dark preview switch was set to Light. The canvas chrome and the email preview need to be independently controllable, since they represent different things (UI preference vs inbox-rendering simulation).
+**Root cause:** The `.app-dark .bg-stone-100` / `.text-stone-X` overrides in `globals.css` cascaded into the Canvas subtree without exclusion. Anything in the editor that used those utility classes flipped.
+**Fix:** `components/editor/Canvas.tsx:162` adds an `mb-canvas-island` class on the canvas `<main>`. `app/globals.css` then adds a reset block (`.app-dark .mb-canvas-island ...`) that overrides each app-dark utility-class flip back to its original light value, with the higher 3-class specificity beating the 2-class app-dark rules. Canvas's own `forceDark` / `previewScheme` continues to drive the canvas chrome and the iframe.
+**Verified by:** User toggles app dark mode in toolbar, editor chrome flips, canvas + email preview stay on whatever the canvas Light/Dark switch is set to.
+**Never regress to:** Letting `.app-dark` overrides cascade everywhere. Anything that has its own independent dark/light state must be marked with `mb-canvas-island` (or a similarly scoped class) and have explicit resets.
+
+---
+
 ## 2026-05-19 — Dark-mode toggle only affected the email preview, not the app UI
 
 **Problem:** The Dark mode toggle in the toolbar made the compiled email include dark-mode CSS, but left the editor chrome (toolbar, palette, outline, property panel) in light mode. Users expected a single switch to flip the whole interface.

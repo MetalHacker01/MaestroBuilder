@@ -160,8 +160,15 @@ export function Canvas() {
 
   return (
     <main
+      // `mb-canvas-island` opts this subtree out of the app-dark utility
+      // overrides in globals.css. The canvas has its own Light/Dark
+      // preview switch (`previewScheme`) that drives `forceDark` here,
+      // and the inbox-rendered iframe inside is controlled by the
+      // forceDark URL param sent to /api/render. App-wide dark mode
+      // (the toolbar toggle) must not interfere with either. See
+      // globals.css `.app-dark .mb-canvas-island ...` reset block.
       className={cn(
-        "relative flex h-full min-w-0 flex-1 flex-col transition-colors",
+        "mb-canvas-island relative flex h-full min-w-0 flex-1 flex-col transition-colors",
         forceDark ? "bg-stone-900" : "bg-stone-100"
       )}
     >
