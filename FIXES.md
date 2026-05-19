@@ -29,13 +29,16 @@ Format per entry:
 
 ---
 
-## 2026-05-19 — App dark mode bled into the canvas
+## 2026-05-19 — App dark mode STILL bled into the canvas after first attempt
 
-**Problem:** Right after wiring `theme.darkMode` to flip the editor chrome via `.app-dark` on `<html>`, the Canvas component also went dark even when its own Light/Dark preview switch was set to Light. The canvas chrome and the email preview need to be independently controllable, since they represent different things (UI preference vs inbox-rendering simulation).
-**Root cause:** The `.app-dark .bg-stone-100` / `.text-stone-X` overrides in `globals.css` cascaded into the Canvas subtree without exclusion. Anything in the editor that used those utility classes flipped.
-**Fix:** `components/editor/Canvas.tsx:162` adds an `mb-canvas-island` class on the canvas `<main>`. `app/globals.css` then adds a reset block (`.app-dark .mb-canvas-island ...`) that overrides each app-dark utility-class flip back to its original light value, with the higher 3-class specificity beating the 2-class app-dark rules. Canvas's own `forceDark` / `previewScheme` continues to drive the canvas chrome and the iframe.
-**Verified by:** User toggles app dark mode in toolbar, editor chrome flips, canvas + email preview stay on whatever the canvas Light/Dark switch is set to.
-**Never regress to:** Letting `.app-dark` overrides cascade everywhere. Anything that has its own independent dark/light state must be marked with `mb-canvas-island` (or a similarly scoped class) and have explicit resets.
+**Problem:** After adding the `mb-canvas-island` class + reset rules, the canvas was still going dark when the app was in dark mode and the canvas's own Light/Dark switch was on Light. The email-card inside the canvas stayed white (so the reset was partially working), but the SURROUND (the area between the canvas chrome and the white email card) was dark.
+**Root cause:** The canvas `<main>` element has BOTH `mb-canvas-island` AND its base utility class (`bg-stone-100` or `bg-stone-900`) on the SAME element. The reset selector `.app-dark .mb-canvas-island .bg-stone-100` uses a descendant combinator (space) which only matches `.bg-stone-100` inside a `.mb-canvas-island` ancestor, NOT the same node. So the main element was caught by `.app-dark .bg-stone-100` (the app-dark override) and missed by the reset. Descendants like the white email card (`<div class="bg-white">`) WERE caught because they really were descendants.
+**Fix:** `app/globals.css` reset block, every rule now has TWO selectors:
+- `.app-dark .mb-canvas-island.X` (no space) for same-element matches like the canvas main itself
+- `.app-dark .mb-canvas-island .X` (with space) for descendants
+Added explicit `.bg-stone-900` to the reset so the canvas's dark-preview surround also stays correctly dark when forceDark is on.
+**Verified by:** Served CSS contains `.mb-canvas-island.bg-stone-100`, `.bg-stone-900`, `.bg-white`, plus text/border same-element variants. User confirms canvas surround stays light when canvas L/D switch is on Light, regardless of app dark mode.
+**Never regress to:** Using only descendant combinators (` `) for utility-class resets when the target element has both the scope class AND the utility class on the same node. Always include the same-element variant (`.scope.utility`) alongside the descendant variant (`.scope .utility`).
 
 ---
 
