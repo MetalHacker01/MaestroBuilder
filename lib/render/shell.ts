@@ -7,6 +7,11 @@ export type ShellOptions = {
   theme?: Theme;
   /** When true, the dark-mode CSS is applied unconditionally (forces dark in the editor preview). */
   forceDark?: boolean;
+  /** When true, NO dark-mode CSS is emitted at all and meta color-scheme is
+   * pinned to "light". Used when the canvas Light/Dark switch is on Light,
+   * so the preview never goes dark via prefers-color-scheme even if the OS
+   * is set to dark. forceLight overrides forceDark. */
+  forceLight?: boolean;
   /** Used to generate per-instance dark-mode rules. */
   instances?: ModuleInstance[];
 };
@@ -273,7 +278,12 @@ export function wrapMjml(body: string, options: ShellOptions = {}): string {
   const bg = options.backgroundColor ?? LIGHT_BG;
   const width = options.width ?? 640;
   const theme = options.theme ?? {};
-  const darkEnabled = !!theme.darkMode || !!options.forceDark;
+  // forceLight is an explicit "no dark CSS, period" signal from the canvas's
+  // Light button. It wins over theme.darkMode and forceDark. Without this,
+  // a user with theme.darkMode=true and OS-prefers-dark would see the
+  // preview go dark via @media (prefers-color-scheme: dark) inside the
+  // iframe even though they explicitly clicked "Light" in the canvas.
+  const darkEnabled = !options.forceLight && (!!theme.darkMode || !!options.forceDark);
 
   const darkBlock =
     darkEnabled && options.instances && options.instances.length > 0

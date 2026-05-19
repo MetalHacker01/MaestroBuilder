@@ -27,6 +27,11 @@ export async function POST(req: NextRequest) {
     const url = new URL(req.url);
     const mode: RenderMode = url.searchParams.get("mode") === "preview" ? "preview" : "export";
     const forceDark = url.searchParams.get("forceDark") === "1";
+    // `forceLight` overrides everything else: the canvas's Light button
+    // means "render the preview as if the recipient was in light mode",
+    // independent of theme.darkMode and the OS color-scheme preference.
+    // Sent from Canvas when previewScheme === "light".
+    const forceLight = url.searchParams.get("forceLight") === "1";
     const body = await req.json();
     const parsed = templateSchema.safeParse(body);
     if (!parsed.success) {
@@ -39,6 +44,7 @@ export async function POST(req: NextRequest) {
       mode,
       theme: parsed.data.theme,
       forceDark,
+      forceLight,
     });
     // Prefer x-forwarded-host (Vercel sets this) over the rewritten internal
     // host so the absolute URL matches what the user sees in the browser.

@@ -96,6 +96,12 @@ export function Canvas() {
       setRendering(true);
       const params = new URLSearchParams({ mode: "preview" });
       if (forceDark) params.set("forceDark", "1");
+      // forceLight is the explicit "render this preview as if the
+      // recipient client was in light mode" signal. Sent when the canvas
+      // L/D switch is on Light. Without it, theme.darkMode=true plus an
+      // OS in dark mode would let the @media (prefers-color-scheme: dark)
+      // block fire inside the iframe and override our Light selection.
+      if (previewScheme === "light") params.set("forceLight", "1");
       fetch(`/api/render?${params.toString()}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -15,6 +15,11 @@ export type CompileOptions = {
   theme?: Theme;
   /** Force the dark-mode CSS on, regardless of prefers-color-scheme. Used in editor preview. */
   forceDark?: boolean;
+  /** Force the preview to render as if the recipient was on a light client.
+   * Skips emitting any dark-mode CSS and pins meta color-scheme to "light"
+   * so iframe-level prefers-color-scheme: dark cannot activate the dark
+   * variant. Used when the canvas Light/Dark switch is on Light. */
+  forceLight?: boolean;
 };
 
 const SECTION_TAG_REGEX = /<mj-section(\s[^>]*)?>/g;
@@ -77,7 +82,12 @@ function annotate(mjml: string, uid: string): string {
   return out;
 }
 
-export function buildMjml(instances: ModuleInstance[], theme?: Theme, forceDark = false): string {
+export function buildMjml(
+  instances: ModuleInstance[],
+  theme?: Theme,
+  forceDark = false,
+  forceLight = false
+): string {
   const body = instances
     .map((inst) => {
       const m = getModule(inst.moduleId);
@@ -90,21 +100,21 @@ export function buildMjml(instances: ModuleInstance[], theme?: Theme, forceDark 
       }
     })
     .join("\n");
-  return wrapMjml(body, { theme, forceDark, instances });
+  return wrapMjml(body, { theme, forceDark, forceLight, instances });
 }
 
 export async function compileTemplate(
   instances: ModuleInstance[],
   options: CompileOptions = {}
 ): Promise<RenderResult> {
-  const { mode = "export", theme, forceDark } = options;
+  const { mode = "export", theme, forceDark, forceLight } = options;
   if (!instances || instances.length === 0) {
     return {
-      html: emptyDocument(mode, !!forceDark),
+      html: emptyDocument(mode, !!forceDark && !forceLight),
       errors: [],
     };
   }
-  const mjmlSource = buildMjml(instances, theme, forceDark);
+  const mjmlSource = buildMjml(instances, theme, forceDark, forceLight);
   const result = await mjml2html(mjmlSource, {
     validationLevel: "soft",
     keepComments: false,

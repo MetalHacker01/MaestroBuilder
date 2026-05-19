@@ -29,6 +29,20 @@ Format per entry:
 
 ---
 
+## 2026-05-19 — Email preview ignored the canvas Light button when app dark + OS dark
+
+**Problem:** Even after the canvas-surround reset was fixed, the email rendered INSIDE the iframe still showed dark content when the canvas Light/Dark switch was on Light, provided the app's Dark mode toggle was on and the OS was in dark mode.
+**Root cause:** The render pipeline emitted a `@media (prefers-color-scheme: dark)` block in the email whenever `theme.darkMode` was true. The canvas's L/D switch only set the `forceDark` flag which controls whether the dark CSS is wrapped in @media (no force = wrapped). Light was the absence of forceDark, not an active "force light" signal. So with `theme.darkMode=true` and `forceDark=false`, the dark CSS sat in @media (prefers-color-scheme: dark), which the iframe activated because the OS preferred dark.
+**Fix:**
+- `app/api/render/route.ts`: new `forceLight=1` query param.
+- `lib/render/compile.ts`: `CompileOptions.forceLight` plumbed through.
+- `lib/render/shell.ts`: `wrapMjml()` computes `darkEnabled = !forceLight && (theme.darkMode || forceDark)`. forceLight short-circuits to false, no dark block emitted, meta color-scheme pinned to "light".
+- `components/editor/Canvas.tsx`: when `previewScheme === "light"`, send `forceLight=1` in the render API request.
+**Verified by:** Round-trip test confirmed `prefers-color-scheme: dark` block count = 0 when forceLight=1, meta color-scheme = "light" only. User confirms the email preview stays light when canvas L/D switch is Light, independent of app dark mode + OS prefers-color-scheme.
+**Never regress to:** Treating "Light" as the absence of "Dark" in the preview path. Both Light and Dark need explicit, equally-weighted signals to the render pipeline, otherwise OS / parent-document color-scheme leaks through.
+
+---
+
 ## 2026-05-19 — App dark mode STILL bled into the canvas after first attempt
 
 **Problem:** After adding the `mb-canvas-island` class + reset rules, the canvas was still going dark when the app was in dark mode and the canvas's own Light/Dark switch was on Light. The email-card inside the canvas stayed white (so the reset was partially working), but the SURROUND (the area between the canvas chrome and the white email card) was dark.
